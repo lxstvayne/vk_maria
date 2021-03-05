@@ -1,0 +1,2 @@
+class KeyboardNotFoundError(Exception):
+    pass
