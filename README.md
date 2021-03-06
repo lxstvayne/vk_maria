@@ -60,7 +60,7 @@ longpoll = LongPoll(vk)
 
 Давайте определим обработчик событий, который будет обрабатывать все входящие сообщения от пользователя в личные сообщения сообщества и отвечать на команду *Начать*:
 ```python
-@longpoll.message_handler(commands='Начать')
+@longpoll.message_handler(commands=['Начать'])
 def send_welcome(event):
     vk.messages_send(user_id=event.message.from_id, message='Добро пожаловать!')
 ```
@@ -86,7 +86,7 @@ from vk_maria import Vk, LongPoll
 vk = Vk(access_token='token')
 longpoll = LongPoll(vk)
 
-@longpoll.message_handler(commands='Начать')
+@longpoll.message_handler(commands=['Начать'])
 def send_welcome(event):
     vk.messages_send(user_id=event.message.from_id, message='Добро пожаловать!')
 
