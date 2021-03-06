@@ -125,7 +125,7 @@ for event in longpoll.listen():
 ```
 Так и через удобный декоратор `message_handler`:
 ```python
-longpoll.message_handler()
+@longpoll.message_handler()
 def do_smth(event):
     ...
 
@@ -137,7 +137,7 @@ ___
 Обработчик событий это функция с декоратором `message_handler()`. Он определяет фильтры для обрабатываемых событий.
 
 ```python
-longpoll.message_handler(**filters)
+@longpoll.message_handler(**filters)
 def do_smth(event):
     ...
 ```
