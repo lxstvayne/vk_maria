@@ -60,13 +60,13 @@ longpoll = LongPoll(vk)
 
 Давайте определим обработчик событий, который будет обрабатывать все входящие сообщения от пользователя в личные сообщения сообщества и отвечать на команду *Начать*:
 ```python
-@longpoll.message_handler(commands=['Начать'])
+@longpoll.event_handler(commands=['Начать'])
 def send_welcome(event):
     vk.messages_send(user_id=event.message.from_id, message='Добро пожаловать!')
 ```
 Добавим ещё один обработчик:
 ```python
-@longpoll.message_handler()
+@longpoll.event_handler()
 def echo(event):
     vk.messages_send(user_id=event.message.from_id, message=event.message.text)
 ```
@@ -86,11 +86,11 @@ from vk_maria import Vk, LongPoll
 vk = Vk(access_token='token')
 longpoll = LongPoll(vk)
 
-@longpoll.message_handler(commands=['Начать'])
+@longpoll.event_handler(commands=['Начать'])
 def send_welcome(event):
     vk.messages_send(user_id=event.message.from_id, message='Добро пожаловать!')
 
-@longpoll.message_handler()
+@longpoll.event_handler()
 def echo(event):
     vk.messages_send(user_id=event.message.from_id, message=event.message.text)
 
@@ -123,9 +123,9 @@ ___
 for event in longpoll.listen():
     ...
 ```
-Так и через удобный декоратор `message_handler`:
+Так и через удобный декоратор `event_handler`:
 ```python
-@longpoll.message_handler()
+@longpoll.event_handler()
 def do_smth(event):
     ...
 
@@ -134,10 +134,10 @@ longpoll.polling()
 ___
 #### Обработчики событий
 
-Обработчик событий это функция с декоратором `message_handler()`. Он определяет фильтры для обрабатываемых событий.
+Обработчик событий это функция с декоратором `event_handler()`. Он определяет фильтры для обрабатываемых событий.
 
 ```python
-@longpoll.message_handler(**filters)
+@longpoll.event_handler(**filters)
 def do_smth(event):
     ...
 ```

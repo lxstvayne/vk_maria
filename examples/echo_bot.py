@@ -7,7 +7,7 @@ def main():
     vk = Vk(access_token='token')
     longpoll = LongPoll(vk)
 
-    @longpoll.message_handler()
+    @longpoll.event_handler()
     def echo(event):
         vk.messages_send(user_id=event.message.from_id, message=event.message.text)
 

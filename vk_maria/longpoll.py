@@ -245,12 +245,12 @@ class LongPoll:
 
     poll = []
 
-    def message_handler(self,
-                        commands: List = None,
-                        frm: str = 'user',
-                        event_type: EventType = EventType.MESSAGE_NEW,
-                        regexp: str = None
-                        ):
+    def event_handler(self,
+                      commands: List = None,
+                      frm: str = 'user',
+                      event_type: EventType = EventType.MESSAGE_NEW,
+                      regexp: str = None
+                      ):
 
         def decorator(func):
 
