@@ -1,6 +1,10 @@
 # <p align="center">vk_maria
 
 <p align="center">Простая в использовании
+   
+[![Downloads](https://pepy.tech/badge/vk-maria)](https://pepy.tech/project/vk-maria)
+[![Downloads](https://pepy.tech/badge/vk-maria/month)](https://pepy.tech/project/vk-maria)
+[![Downloads](https://pepy.tech/badge/vk-maria/week)](https://pepy.tech/project/vk-maria)
 
 * [Установка](#установка)
 * [Ваш первый бот](#ваш-первый-бот)
