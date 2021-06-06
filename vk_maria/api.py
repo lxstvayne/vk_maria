@@ -10,7 +10,7 @@ class ApiMethod:
     rps_delay = 0.05
     last_request = 0.0
 
-    def __init__(self, access_token: str, api_version: float):
+    def __init__(self, access_token: str, api_version: str):
         self.access_token = access_token
         self.api_version = api_version
 
@@ -41,7 +41,7 @@ class Vk:
     :param api_version: Версия Api
     """
 
-    def __init__(self, access_token: str, api_version: float = 5.126):
+    def __init__(self, access_token: str, api_version: str = '5.126'):
         self.method = ApiMethod(access_token=access_token, api_version=api_version)
         self.group_id = GroupsGetById(self.method(method='groups.getById')).id
 
