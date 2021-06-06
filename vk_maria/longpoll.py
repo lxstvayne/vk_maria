@@ -246,15 +246,24 @@ class LongPoll:
     poll = []
 
     def event_handler(self,
+                      event_type: EventType
+                      ):
+
+        def decorator(func):
+            handler_dict = self._build_handler_dict(handler=func, event_type=event_type)
+            self._add_handler(handler_dict)
+
+        return decorator
+
+    def message_handler(self,
                       commands: List = None,
                       frm: str = 'user',
-                      event_type: EventType = EventType.MESSAGE_NEW,
-                      regexp: str = None
+                      regexp: str = None,
                       ):
 
         def decorator(func):
 
-            filters = dict(commands=commands, frm=frm, event_type=event_type, regexp=regexp)
+            filters = dict(commands=commands, frm=frm, event_type=EventType.MESSAGE_NEW, regexp=regexp)
 
             handler_dict = self._build_handler_dict(
                 handler=func,
@@ -271,7 +280,7 @@ class LongPoll:
             if debug:
                 logger.info(event)
 
-            for message_handler in self.poll:
-                if self._test_handler(message_handler['filters'], event):
-                    message_handler['function'](event)
+            for handler in self.poll:
+                if self._test_handler(handler['filters'], event):
+                    handler['function'](event)
                     break
