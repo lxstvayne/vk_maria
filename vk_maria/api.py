@@ -1,4 +1,5 @@
-from .utils import error_catcher, query_delimiter, get_random_id, response_parser
+from .keyboard import Model
+from .utils import error_catcher, query_delimiter, get_random_id, response_parser, args_converter
 from .responses import *
 
 import requests
@@ -17,6 +18,7 @@ class ApiMethod:
     @response_parser
     @error_catcher
     @query_delimiter
+    @args_converter
     def __call__(self, method: str = None, server: str = None, files=None, **kwargs):
         if files:
             response = self.http.post(server, files=files, timeout=90).json()
@@ -121,9 +123,6 @@ class Vk:
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         """
 
-        if fields:
-            fields = ','.join(fields)
-
         return MessagesGetByConversationMessageId(
             self.method(
                 'messages.getByConversationMessageId', group_id=self.group_id, peer_id=peer_id,
@@ -138,11 +137,6 @@ class Vk:
         :param extended: Возвращать дополнительные поля.
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         """
-        if fields:
-            fields = ','.join(fields)
-
-        if message_ids:
-            message_ids = ','.join(str(el) for el in message_ids)
 
         return MessagesGetById(
             self.method('messages.getById', group_id=self.group_id, message_ids=message_ids,
@@ -154,9 +148,6 @@ class Vk:
         :param peer_id: Идентификатор назначения.
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         """
-
-        if fields:
-            fields = ','.join(fields)
 
         return MessagesGetConversationMembers(
             self.method('messages.getConversationMembers', group_id=self.group_id, peer_id=peer_id, fields=fields)
@@ -173,9 +164,6 @@ class Vk:
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         """
 
-        if fields:
-            fields = ','.join(fields)
-
         return MessagesGetConversations(
             self.method(
                 'messages.getConversations', group_id=self.group_id, offset=offset, count=count, filter=filter,
@@ -188,11 +176,6 @@ class Vk:
         :param extended: Возвращать дополнительные поля.
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         """
-
-        peer_ids = ','.join(str(el) for el in peer_ids)
-
-        if fields:
-            fields = ','.join(fields)
 
         return MessagesGetConversationsById(
             self.method('messages.getConversationsById', group_id=self.group_id, peer_ids=peer_ids, extended=extended,
@@ -212,9 +195,6 @@ class Vk:
         :param extended: Возвращать дополнительные поля.
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         """
-
-        if fields:
-            fields = ','.join(fields)
 
         return MessagesGetHistory(
             self.method(
@@ -239,12 +219,6 @@ class Vk:
         :param max_forwards_level: Максимальная глубина вложенности пересланных сообщений.
         """
 
-        if media_type:
-            media_type = ','.join(media_type)
-
-        if fields:
-            fields = ','.join(fields)
-
         return MessagesGetHistoryAttachments(
             self.method(
                 'messages.getHistoryAttachments', group_id=self.group_id, peer_id=peer_id, media_type=media_type,
@@ -262,9 +236,6 @@ class Vk:
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         :param extended: Возвращать дополнительные поля.
         """
-
-        if fields:
-            fields = ','.join(fields)
 
         return MessagesGetImportantMessages(
             self.method(
@@ -287,12 +258,6 @@ class Vk:
 
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         """
-
-        if fields:
-            fields = ','.join(fields)
-
-        if name_case:
-            name_case = ','.join(name_case)
 
         return MessagesGetIntentUsers(
             self.method(
@@ -330,9 +295,6 @@ class Vk:
         :param last_n:
         :param credentials:
         """
-
-        if fields:
-            fields = ','.join(fields)
 
         return MessagesGetLongpollHistory(
             self.method(
@@ -384,9 +346,6 @@ class Vk:
         :param mark_conversation_as_read:
         """
 
-        if message_ids:
-            message_ids = ','.join(str(el) for el in message_ids)
-
         return self.method('messages.markAsRead', group_id=self.group_id, message_ids=message_ids, peer_id=peer_id,
                            start_message_id=start_message_id, mark_conversation_as_read=mark_conversation_as_read)
 
@@ -429,8 +388,6 @@ class Vk:
         :param extended: Возвращать дополнительные поля для пользователей и сообществ.
         :param fields: Список ыудополнительных полей для пользователей и сообществ.
         """
-        if fields:
-            fields = ','.join(fields)
 
         return MessagesSearch(
             self.method('messages.search', group_id=self.group_id, q=q, peer_id=peer_id, date=date,
@@ -444,8 +401,6 @@ class Vk:
         :param extended: Возвращать дополнительные поля.
         :param fields: Дополнительные поля пользователей и сообществ, которые необходимо вернуть в ответе.
         """
-        if fields:
-            fields = ','.join(fields)
 
         return MessagesSearchConversations(
             self.method(
@@ -482,11 +437,6 @@ class Vk:
         :param intent: Строка, описывающая интенты.
         :param subscribe_id:
         """
-        if peer_ids:
-            peer_ids = ','.join(str(el) for el in peer_ids)
-
-        if forward_messages:
-            forward_messages = ','.join(str(el) for el in forward_messages)
 
         return self.method('messages.send', group_id=self.group_id, user_id=user_id, peer_id=peer_id, peer_ids=peer_ids,
                            domain=domain, chat_id=chat_id, message=message, lat=lat, long=long, attachment=attachment,
@@ -692,15 +642,6 @@ class Vk:
         :param city:
         """
 
-        if market_country:
-            market_country = ','.join(str(el) for el in market_country)
-
-        if market_city:
-            market_city = ','.join(str(el) for el in market_city)
-
-        if obscene_words:
-            obscene_words = ','.join(obscene_words)
-
         return self.method('groups.edit', group_id=self.group_id, title=title, description=description,
                            screen_name=screen_name,
                            access=access, website=website, subject=subject, email=email, phone=phone, rss=rss,
@@ -748,8 +689,6 @@ class Vk:
         """
         :param fields: Список дополнительных полей, которые необходимо вернуть.
         """
-        if fields:
-            fields = ','.join(fields)
 
         return GroupsGetById(self.method('groups.getById', group_id=self.group_id, fields=fields))
 
@@ -775,8 +714,6 @@ class Vk:
         :param user_id: Идентификатор пользователя.
         :param user_ids: Идентификаторы пользователей, не более 500.
         """
-        if user_ids:
-            user_ids = ','.join(str(el) for el in user_ids)
 
         return GroupsIsMember(
             self.method('groups.isMember', group_id=self.group_id, user_id=user_id, user_ids=user_ids, extended=1)
@@ -789,8 +726,6 @@ class Vk:
         :param owner_id: Идентификатор пользователя или сообщества из чёрного списка, информацию о котором нужно получить.
         :param offset: Смещение, необходимое для выборки определенного подмножества черного списка.
         """
-        if fields:
-            fields = ','.join(fields)
 
         return GroupsGetBanned(
             self.method('groups.getBanned', group_id=self.group_id, offset=offset, count=count, fields=fields,
@@ -866,8 +801,6 @@ class Vk:
         :param tags: Метки для поиска.
         :param return_tags:
         """
-        if tags:
-            tags = ','.join(tags)
 
         return DocsSave(self.method('docs.save', file=file, title=title, tags=tags, return_tags=return_tags))
 
@@ -1006,9 +939,6 @@ class Vk:
         :param user_id: id пользователя, переменная которого устанавливается, в случае если данные запрашиваются серверным методом.
         """
 
-        if keys:
-            keys = ','.join(keys)
-
         return self.method('storage.get', key=key, keys=keys, user_id=user_id)
 
     def storage_get_keys(self, user_id: int, offset: int = None, count: int = 100) -> List:
@@ -1041,10 +971,6 @@ class Vk:
                               Творительный – ins,
                               Предложный – abl.
         """
-        user_ids = ','.join(str(el) for el in user_ids)
-
-        if fields:
-            fields = ','.join(fields)
 
         return self.method('users.get', user_ids=user_ids, fields=fields, name_case=name_case)
 
@@ -1054,8 +980,6 @@ class Vk:
         :param story_id: Идентификатор истории.
         :param stories:
         """
-        if stories:
-            stories = ','.join(stories)
 
         return self.method('stories.delete', owner_id=owner_id, story_id=story_id, stories=stories)
 
@@ -1065,8 +989,6 @@ class Vk:
         :param extended: 1 — возвращать в ответе дополнительную информацию о профилях пользователей.
         :param fields:
         """
-        if fields:
-            fields = ','.join(fields)
 
         return StoriesGet(self.method('stories.get', owner_id=owner_id, extended=extended, fields=fields))
 
@@ -1076,10 +998,6 @@ class Vk:
         :param extended: 1 — возвращать в ответе дополнительную информацию о пользователях.
         :param fields: Дополнительные поля профилей и сообществ, которые необходимо вернуть в ответе.
         """
-        stories = ','.join(str(el) for el in stories)
-
-        if fields:
-            fields = ','.join(fields)
 
         return StoriesGetById(self.method('stories.getById', stories=stories, extended=extended, fields=fields))
 
@@ -1095,8 +1013,6 @@ class Vk:
         :param link_url: Адрес ссылки для перехода из истории. Допустимы только внутренние ссылки https://vk.com.
         :param clickable_stickers: Объект кликабельного стикера.
         """
-        if user_ids:
-            user_ids = ','.join(str(el) for el in user_ids)
 
         return StoriesGetPhotoUploadServer(
             self.method(
@@ -1114,8 +1030,6 @@ class Vk:
         :param extended: 1 — возвращать дополнительную информацию о профилях и сообществах.
         :param fields: Дополнительные поля профилей и сообществ, которые необходимо вернуть в ответе.
         """
-        if fields:
-            fields = ','.join(fields)
 
         return StoriesGetReplies(self.method('stories.getReplies', owner_id=owner_id, story_id=story_id,
                                              access_key=access_key, extended=extended, fields=fields))
@@ -1179,10 +1093,6 @@ class Vk:
         :param extended:
         :param fields:
         """
-        upload_results = ','.join(upload_results)
-
-        if fields:
-            fields = ','.join(fields)
 
         return StoriesSave(self.method('stories.save', upload_results=upload_results, fields=fields, extended=extended))
 
