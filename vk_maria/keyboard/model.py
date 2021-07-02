@@ -1,3 +1,5 @@
+from enum import Enum
+
 from .. import working_dir
 
 import json
@@ -78,6 +80,12 @@ class Button:
                 'label': label
             }
 
+    class Color(str, Enum):
+        PRIMARY = 'primary'
+        SECONDARY = 'secondary'
+        NEGATIVE = 'negative'
+        POSITIVE = 'positive'
+
 
 class Model:
     """
@@ -92,10 +100,15 @@ class Model:
     row4: List[Button] = None
     row5: List[Button] = None
 
+    @classmethod
+    def to_json(cls):
+        return json.dumps(Constructor.construct_skeletons(cls))
+
 
 class Constructor:
 
-    def unpack_button(self, button):
+    @staticmethod
+    def unpack_button(button):
         if isinstance(button, (Button.Text, Button.Callback)):
             return {
                 'action': button.action,
@@ -105,13 +118,14 @@ class Constructor:
             'action': button.action
         }
 
-    def construct_skeletons(self, cls):
+    @staticmethod
+    def construct_skeletons(cls):
         rows = [row for name, row in cls.__dict__.items() if 'row' in name and row]
         return {
             'inline': cls.inline,
             'one_time': cls.one_time,
             'buttons': [
-                [self.unpack_button(button) for button in row] for row in rows
+                [Constructor.unpack_button(button) for button in row] for row in rows
             ]
         }
 
