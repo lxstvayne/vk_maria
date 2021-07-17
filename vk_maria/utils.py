@@ -1,6 +1,9 @@
+import json
 import threading
 import time
 import random
+
+from pydotdict import DotDict
 
 from .keyboard import Model
 from .exceptions import VkMariaException
@@ -11,6 +14,7 @@ def error_catcher(method):
     def wrapper(self, *args, **kwargs):
         response = method(self, *args, **kwargs)
         e = response[1].get('error')
+
         if e and e['error_code']:
             raise VkMariaException(e['error_code'], e['error_msg'])
 
@@ -49,6 +53,7 @@ def response_parser(method):
     def wrapper(self, *args, **kwargs):
 
         response = method(self, *args, **kwargs)
+
         method_, response = response
         if method_ in fix_methods:
             return response['response'][0]
@@ -95,6 +100,11 @@ def args_converter(method):
             args_dict['stories'] = ','.join(args_dict['stories'])
         if args_dict.get('upload_results'):
             args_dict['upload_results'] = ','.join(args_dict['upload_results'])
+        if args_dict.get('event_data'):
+            if isinstance(args_dict['event_data'], DotDict):
+                args_dict['event_data'] = args_dict['event_data'].to_dict()
+            if isinstance(args_dict['event_data'], dict):
+                args_dict['event_data'] = json.dumps(args_dict['event_data'])
 
         return method(self, *args, **args_dict)
 
