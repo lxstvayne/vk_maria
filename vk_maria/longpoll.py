@@ -1,4 +1,5 @@
 from .api import Vk
+from .types import Message
 
 from requests.exceptions import ReadTimeout
 from enum import Enum
@@ -7,6 +8,7 @@ import re
 
 from loguru import logger
 import sys
+
 from typing import Union, List
 
 logger.remove()
@@ -89,8 +91,10 @@ class EventType(Enum):
 
 
 class Event:
+    def __init__(self, vk, raw):
 
-    def __init__(self, raw):
+        self.vk = vk
+        self.fields = {}
 
         try:
             self.type = EventType(raw['type'])
@@ -98,40 +102,19 @@ class Event:
             self.type = raw['type']
 
         for k, v in raw['object'].items():
-            self.__dict__.update({k: DotDict(v) if isinstance(v, dict) else v})
+            self.fields.update({k: DotDict(v) if isinstance(v, dict) else v})
+
+        self.__dict__.update(self.fields)
 
         self.group_id = raw['group_id']
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}({", ".join(f"{k}={v}" for k, v in self.__dict__.items())})>'
+        return f'<{self.__class__.__name__}({", ".join(f"{k}={v}" for k, v in self.fields.items())})>'
 
 
-class Message(DotDict):
-    date: int
-    from_id: int
-    id: int
-    out: int
-    peer_id: int
-    text: str
-    conversation_message_id: int
-    fwd_messages: list
-    important: bool
-    random_id: int
-    attachments: list
-    is_hidden: bool
-
-
-class MessageEvent(Event):
-
-    message: Message
-    from_user: bool
-    from_chat: bool
-    from_group: bool
-    chat_id: Union[int, None]
-    peer_id: int = None
-
-    def __init__(self, raw):
-        super().__init__(raw)
+class MessageEvent(Event, Message):
+    def __init__(self, vk, raw):
+        super().__init__(vk, raw)
 
         self.from_user = False
         self.from_chat = False
@@ -175,7 +158,7 @@ class LongPoll:
             raw_event['type'],
             self.DEFAULT_EVENT_CLASS
         )
-        return event_class(raw_event)
+        return event_class(self.vk, raw_event)
 
     def _check(self):
         response = self.vk.method(server=self.server, key=self.key, ts=self.ts, wait=self.wait, act='a_check')
