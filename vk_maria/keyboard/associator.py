@@ -1,8 +1,8 @@
-from .model import Constructor
+from .utils import get_keyboards_from_files, get_keyboards_from_models
 from .exceptions import *
 
 
-class Keyboards:
+class KeyboardAssociator:
     """
     Объект, через который можно обращаться к клавиатурам из моделей или папки.
 
@@ -13,9 +13,13 @@ class Keyboards:
     def __init__(self, models: str = None, folder: str = None):
         self.KEYBOARDS_MODELS = models
         self.KEYBOARDS_FOLDER = folder
-        self.keyboards = Constructor(models, folder).kbs
+        self.keyboards = {}
+        if folder:
+            self.keyboards.update(get_keyboards_from_files(folder))
+        if models:
+            self.keyboards.update(get_keyboards_from_models(models))
 
-    def __call__(self, keyboard_name):
+    def __getitem__(self, keyboard_name):
         try:
             return self.keyboards[keyboard_name]
         except KeyError:

@@ -1,11 +1,7 @@
 from enum import Enum
 
-from .. import working_dir
-
 import json
-import inspect
-import sys
-import os
+
 
 from typing import List
 
@@ -59,14 +55,14 @@ class Button:
     class VKApps:
         type = 'open_app'
 
-        def __init__(self, app_id: int, owner_id: int, label: str, hash: str, payload: dict):
+        def __init__(self, app_id: int, owner_id: int, label: str, hash: str, payload: dict = None):
             self.action = {
                 'type': self.type,
                 'app_id': app_id,
                 'owner_id': owner_id,
-                'payload': payload,
                 'label': label,
-                'hash': hash
+                'hash': hash,
+                'payload': payload
             }
 
     class Callback:
@@ -80,11 +76,12 @@ class Button:
                 'label': label
             }
 
-    class Color(str, Enum):
-        PRIMARY = 'primary'
-        SECONDARY = 'secondary'
-        NEGATIVE = 'negative'
-        POSITIVE = 'positive'
+
+class Color(str, Enum):
+    PRIMARY = 'primary'
+    SECONDARY = 'secondary'
+    NEGATIVE = 'negative'
+    POSITIVE = 'positive'
 
 
 class Model:
@@ -102,61 +99,28 @@ class Model:
 
     @classmethod
     def to_json(cls):
-        return json.dumps(Constructor.construct_skeletons(cls))
+        return json.dumps(construct_json(cls))
 
 
-class Constructor:
-
-    @staticmethod
-    def unpack_button(button):
-        if isinstance(button, (Button.Text, Button.Callback)):
-            return {
-                'action': button.action,
-                'color': button.color
-            }
+def unpack_button(button):
+    if isinstance(button, (Button.Text, Button.Callback)):
         return {
-            'action': button.action
+            'action': button.action,
+            'color': button.color
         }
+    return {
+        'action': button.action
+    }
 
-    @staticmethod
-    def construct_skeletons(cls):
-        rows = [row for name, row in cls.__dict__.items() if 'row' in name and row]
-        return {
-            'inline': cls.inline,
-            'one_time': cls.one_time,
-            'buttons': [
-                [Constructor.unpack_button(button) for button in row] for row in rows
-            ]
-        }
 
-    def construct_from_files(self):
-        k_dir = os.path.join(working_dir, self.folder)
+def construct_json(model_cls):
+    rows = [row for name, row in model_cls.__dict__.items() if 'row' in name and row]
+    return {
+        'inline': model_cls.inline,
+        'one_time': model_cls.one_time,
+        'buttons': [
+            [unpack_button(button) for button in row] for row in rows
+        ]
+    }
 
-        keyboards = {}
-        for file in os.listdir(k_dir):
-            keyboards[file.split('.')[0]] = open(os.path.join(k_dir, file)).read()
 
-        return keyboards
-
-    def construct_models(self):
-        if self.models:
-            module = __import__(self.models)
-            keyboard_models = []
-            for keyboard in inspect.getmembers(sys.modules[module.__name__], inspect.isclass):
-                if Model in keyboard[1].__bases__:
-                    keyboard_models.append(keyboard[1])
-
-            keyboards = {}
-            for keyboard in keyboard_models:
-                keyboards[keyboard.__name__] = json.dumps(self.construct_skeletons(keyboard))
-
-            return keyboards
-
-    def __init__(self, models, folder):
-        self.models = models
-        self.folder = folder
-        self.kbs = {}
-        if models:
-            self.kbs.update(self.construct_models())
-        if folder:
-            self.kbs.update(self.construct_from_files())

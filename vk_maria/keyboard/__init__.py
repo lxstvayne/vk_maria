@@ -1,2 +1,2 @@
-from .keyboard import Keyboards
-from .model import Model, Button
+from .associator import KeyboardAssociator
+from .model import Model, Button, Color
