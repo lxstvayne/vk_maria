@@ -4,7 +4,7 @@ import os
 import sys
 
 from .exceptions import *
-from .model import construct_json, Model
+from .keyboard import construct_json, Model
 from .. import working_dir
 
 
