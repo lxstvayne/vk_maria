@@ -9,7 +9,7 @@ import re
 from loguru import logger
 import sys
 
-from typing import Union, List
+import typing
 
 logger.remove()
 logger.add(sys.stdout,
@@ -131,6 +131,20 @@ class MessageEvent(Event, Message):
             self.from_chat = True
             self.chat_id = peer_id - CHAT_START_ID
 
+    def answer(self, **kwargs):
+        if self.from_user:
+            kwargs.update(from_id=self.message.from_id)
+        elif self.from_chat:
+            kwargs.update(peer_id=self.message.peer_id)
+        elif self.from_group:
+            kwargs.update(peer_id=self.message.from_id)
+        print(kwargs)
+        self.vk.messages_send(**kwargs)
+
+    def reply(self, **kwargs):
+        kwargs.update(reply_to=self.message.conversation_message_id)
+        self.answer(**kwargs)
+
 class LongPoll:
 
     CLASS_BY_EVENT_TYPE = {
@@ -240,10 +254,10 @@ class LongPoll:
         return decorator
 
     def message_handler(self,
-                      commands: List = None,
-                      frm: str = 'user',
-                      regexp: str = None,
-                      ):
+                        commands: typing.List = None,
+                        frm: str = 'user',
+                        regexp: str = None,
+                        ):
         return self.event_handler(event_type=EventType.MESSAGE_NEW, commands=commands, frm=frm, regexp=regexp)
 
     def polling(self, debug=False):

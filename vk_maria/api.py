@@ -1,4 +1,3 @@
-from .keyboard import Model
 from .utils import error_catcher, query_delimiter, get_random_id, response_parser, args_converter
 from .responses import *
 

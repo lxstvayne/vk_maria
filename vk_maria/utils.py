@@ -69,43 +69,48 @@ def response_parser(method):
 def args_converter(method):
 
     def wrapper(self, *args, **kwargs):
-        args_dict = kwargs
-        if args_dict.get('peer_ids'):
-            args_dict['peer_ids'] = ','.join(str(el) for el in args_dict['peer_ids'])
-        if args_dict.get('forward_messages'):
-            args_dict['forward_messages'] = ','.join(str(el) for el in args_dict['forward_messages'])
-        if args_dict.get('keyboard') and not isinstance(args_dict.get('keyboard'), str) and issubclass(args_dict.get('keyboard'), Model):
-            args_dict['keyboard'] = args_dict['keyboard'].to_json()
-        if args_dict.get('fields'):
-            args_dict['fields'] = ','.join(args_dict['fields'])
-        if args_dict.get('message_ids'):
-            args_dict['message_ids'] = ','.join(str(el) for el in args_dict['message_ids'])
-        if args_dict.get('media_type'):
-            args_dict['media_type'] = ','.join(args_dict['media_type'])
-        if args_dict.get('name_case'):
-            args_dict['name_case'] = ','.join(args_dict['name_case'])
-        if args_dict.get('market_country'):
-            args_dict['market_country'] = ','.join(str(el) for el in args_dict['market_country'])
-        if args_dict.get('market_city'):
-            args_dict['market_city'] = ','.join(str(el) for el in args_dict['market_city'])
-        if args_dict.get('obscene_words'):
-            args_dict['obscene_words'] = ','.join(args_dict['obscene_words'])
-        if args_dict.get('user_ids'):
-            args_dict['user_ids'] = ','.join(str(el) for el in args_dict['user_ids'])
-        if args_dict.get('tags'):
-            args_dict['tags'] = ','.join(args_dict['tags'])
-        if args_dict.get('keys'):
-            args_dict['keys'] = ','.join(args_dict['keys'])
-        if args_dict.get('stories'):
-            args_dict['stories'] = ','.join(args_dict['stories'])
-        if args_dict.get('upload_results'):
-            args_dict['upload_results'] = ','.join(args_dict['upload_results'])
-        if args_dict.get('event_data'):
-            if isinstance(args_dict['event_data'], DotDict):
-                args_dict['event_data'] = args_dict['event_data'].to_dict()
-            if isinstance(args_dict['event_data'], dict):
-                args_dict['event_data'] = json.dumps(args_dict['event_data'])
+        for keyword, value in kwargs.items():
 
-        return method(self, *args, **args_dict)
+            if not value:
+                continue
+
+            if keyword == 'peer_ids':
+                kwargs[keyword] = ','.join(str(el) for el in value)
+            elif keyword == 'forward_messages':
+                kwargs[keyword] = ','.join(str(el) for el in value)
+            elif keyword == 'keyboard' and not isinstance(value, str) and issubclass(value, Model):
+                kwargs[keyword] = value.to_json()
+            elif keyword == 'fields':
+                kwargs[keyword] = ','.join(value)
+            elif keyword == 'message_ids':
+                kwargs[keyword] = ','.join(str(el) for el in value)
+            elif keyword == 'media_type':
+                kwargs[keyword] = ','.join(value)
+            elif keyword == 'name_case':
+                kwargs[keyword] = ','.join(value)
+            elif keyword == 'market_country':
+                kwargs[keyword] = ','.join(str(el) for el in value)
+            elif keyword == 'market_city':
+                kwargs[keyword] = ','.join(str(el) for el in value)
+            elif keyword == 'obscene_words':
+                kwargs[keyword] = ','.join(value)
+            elif keyword == 'user_ids':
+                kwargs[keyword] = ','.join(str(el) for el in value)
+            elif keyword == 'tags':
+                kwargs[keyword] = ','.join(value)
+            elif keyword == 'keys':
+                kwargs[keyword] = ','.join(value)
+            elif keyword == 'stories':
+                kwargs[keyword] = ','.join(value)
+            elif keyword == 'upload_results':
+                kwargs[keyword] = ','.join(value)
+            elif keyword == 'event_data':
+                if isinstance(value, DotDict):
+                    value = value.to_dict()
+                    kwargs[keyword] = value
+                if isinstance(value, dict):
+                    kwargs[keyword] = json.dumps(value)
+
+        return method(self, *args, **kwargs)
 
     return wrapper
