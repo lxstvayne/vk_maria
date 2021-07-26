@@ -133,12 +133,12 @@ class MessageEvent(Event, Message):
 
     def answer(self, **kwargs):
         if self.from_user:
-            kwargs.update(from_id=self.message.from_id)
+            kwargs.update(user_id=self.message.from_id)
         elif self.from_chat:
             kwargs.update(peer_id=self.message.peer_id)
         elif self.from_group:
             kwargs.update(peer_id=self.message.from_id)
-        print(kwargs)
+
         self.vk.messages_send(**kwargs)
 
     def reply(self, **kwargs):
