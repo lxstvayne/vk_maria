@@ -79,7 +79,7 @@ def args_converter(method):
             elif keyword == 'forward_messages':
                 kwargs[keyword] = ','.join(str(el) for el in value)
             elif keyword == 'keyboard' and not isinstance(value, str) and issubclass(value, Model):
-                kwargs[keyword] = value.to_json()
+                kwargs[keyword] = value.__json__
             elif keyword == 'fields':
                 kwargs[keyword] = ','.join(value)
             elif keyword == 'message_ids':

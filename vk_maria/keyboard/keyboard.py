@@ -84,7 +84,16 @@ class Color(str, Enum):
     POSITIVE = 'positive'
 
 
-class Model:
+class ModelMeta(type):
+    def __new__(cls, name, bases, namespace):
+
+        if bases:
+            namespace['__json__'] = construct_json(namespace)
+
+        return super().__new__(cls, name, bases, namespace)
+
+
+class Model(metaclass=ModelMeta):
     """
     Объект описывающий клавиатуру.
     """
@@ -97,9 +106,7 @@ class Model:
     row4: List[Button] = None
     row5: List[Button] = None
 
-    @classmethod
-    def to_json(cls):
-        return json.dumps(construct_json(cls))
+    __json__ = None
 
 
 def unpack_button(button):
@@ -113,14 +120,14 @@ def unpack_button(button):
     }
 
 
-def construct_json(model_cls):
-    rows = [row for name, row in model_cls.__dict__.items() if 'row' in name and row]
-    return {
-        'inline': model_cls.inline,
-        'one_time': model_cls.one_time,
+def construct_json(model_dict):
+    rows = [row for name, row in model_dict.items() if 'row' in name and row]
+    return json.dumps({
+        'inline': model_dict.get('inline'),
+        'one_time': model_dict.get('one_time'),
         'buttons': [
             [unpack_button(button) for button in row] for row in rows
         ]
-    }
+    })
 
 

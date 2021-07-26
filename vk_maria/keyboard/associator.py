@@ -36,7 +36,7 @@ class KeyboardAssociator:
 
         keyboards = {}
         for keyboard in keyboard_models:
-            keyboards[keyboard.__name__] = json.dumps(construct_json(keyboard))
+            keyboards[keyboard.__name__] = construct_json(keyboard.__dict__)
 
         return keyboards
 
