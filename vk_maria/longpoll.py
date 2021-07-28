@@ -101,6 +101,8 @@ class Event:
         except ValueError:
             self.type = raw['type']
 
+        self.fields.update({'type': self.type})
+
         for k, v in raw['object'].items():
             self.fields.update({k: DotDict(v) if isinstance(v, dict) else v})
 
@@ -131,7 +133,7 @@ class MessageEvent(Event, Message):
             self.from_chat = True
             self.chat_id = peer_id - CHAT_START_ID
 
-    def answer(self, **kwargs):
+    def answer(self, message: str = None, **kwargs):
         if self.from_user:
             kwargs.update(user_id=self.message.from_id)
         elif self.from_chat:
@@ -139,11 +141,12 @@ class MessageEvent(Event, Message):
         elif self.from_group:
             kwargs.update(peer_id=self.message.from_id)
 
-        self.vk.messages_send(**kwargs)
+        self.vk.messages_send(message=message, **kwargs)
 
-    def reply(self, **kwargs):
+    def reply(self, message: str = None, **kwargs):
         kwargs.update(reply_to=self.message.conversation_message_id)
-        self.answer(**kwargs)
+        self.answer(message=message, **kwargs)
+
 
 class LongPoll:
 
