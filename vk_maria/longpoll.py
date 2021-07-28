@@ -257,7 +257,7 @@ class LongPoll:
         return decorator
 
     def message_handler(self,
-                        commands: typing.List = None,
+                        commands: typing.List[str] = None,
                         frm: str = 'user',
                         regexp: str = None,
                         ):
