@@ -1,4 +1,5 @@
-from vk_maria import Vk, LongPoll, EventType
+from vk_maria import Vk, types
+from vk_maria.longpoll import LongPoll, EventType
 
 
 def main():
@@ -8,9 +9,9 @@ def main():
     longpoll = LongPoll(vk)
 
     @longpoll.event_handler(event_type=EventType.MESSAGE_NEW)
-    def new_msg(event):
+    def new_msg(event: types.Message):
         print(f'Новое сообщение для меня от {event.message.peer_id}')
-        vk.messages_send(user_id=event.message.from_id, message=event.message.text)
+        event.answer(event.message.text)
 
     @longpoll.event_handler(event_type=EventType.MESSAGE_REPLY)
     def reply_msg(event):

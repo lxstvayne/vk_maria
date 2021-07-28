@@ -1,10 +1,10 @@
-from ..longpoll import EventType
 import typing
 from pydotdict import DotDict
 
 
+
 class BaseEvent:
-    type: EventType
+    type: str
 
 
 class MessageInfo(DotDict):
