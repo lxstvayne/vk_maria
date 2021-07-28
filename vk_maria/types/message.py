@@ -1,5 +1,10 @@
+from ..longpoll import EventType
 import typing
 from pydotdict import DotDict
+
+
+class BaseEvent:
+    type: EventType
 
 
 class MessageInfo(DotDict):
@@ -17,7 +22,7 @@ class MessageInfo(DotDict):
     is_hidden: bool
 
 
-class Message:
+class Message(BaseEvent):
     message: MessageInfo
     from_user: bool
     from_chat: bool
