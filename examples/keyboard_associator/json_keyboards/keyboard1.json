@@ -1,0 +1,24 @@
+{
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Очень важный текст",
+          "payload": ""
+        },
+        "color": "primary"
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Текст",
+          "payload": ""
+        },
+        "color": "positive"
+      }
+    ]
+  ]
+}

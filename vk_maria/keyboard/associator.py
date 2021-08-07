@@ -54,3 +54,6 @@ class KeyboardAssociator:
             return self.keyboards[keyboard_name]
         except KeyError:
             raise KeyboardNotFoundError('Not found')
+
+    def __getattr__(self, item):
+        return self.__getitem__(item)
