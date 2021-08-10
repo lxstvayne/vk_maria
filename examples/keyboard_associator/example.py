@@ -21,7 +21,7 @@ def main():
 
     vk = Vk(access_token='token')
     longpoll = LongPoll(vk)
-    keyboard = KeyboardAssociator(module=__name__, folder='json_keyboards')
+    keyboard = KeyboardAssociator(models=__name__, folder='json_keyboards')
 
     @longpoll.message_handler()
     def echo(event: types.Message):
