@@ -1,3 +1,5 @@
+from os import PathLike
+
 from .utils import open_files
 from ..api import Vk
 
@@ -12,7 +14,7 @@ class Upload:
         self.vk = vk
         self.method = self.vk.method
 
-    def photo(self, photo: Union[str, BinaryIO]):
+    def photo(self, photo: Union[str, bytes, PathLike]):
         """Загрузка фотографии, возвращает объект для вставки в сообщение"""
 
         data = open_files(photo, 'photo')
@@ -24,7 +26,7 @@ class Upload:
         return f'photo{p.owner_id}_{p.id}_{p.access_key}'
 
     def set_chat_photo(self,
-                       photo: Union[str, BinaryIO],
+                       photo: Union[str, bytes, PathLike],
                        chat_id: int,
                        crop_x: int = None,
                        crop_y: int = None,
@@ -45,7 +47,7 @@ class Upload:
         return self.vk.messages_set_chat_photo(file=response['response'])
 
     def set_group_cover_photo(self,
-                              photo: Union[str, BinaryIO],
+                              photo: Union[str, bytes, PathLike],
                               crop_x: int = None,
                               crop_y: int = None,
                               crop_x2: int = None,
@@ -66,7 +68,7 @@ class Upload:
         return self.vk.photos_save_owner_cover_photo(response['hash'], response['photo'])
 
     def document(self,
-                 document: Union[str, BinaryIO, List[Union[str, BinaryIO]]],
+                 document: Union[str, BinaryIO, PathLike, List[Union[str, BinaryIO, PathLike]]],
                  peer_id: int,
                  title: str = None,
                  tags: List[str] = None,

@@ -1,4 +1,5 @@
-from vk_maria import Vk, Upload
+from vk_maria import Vk
+from vk_maria.upload import Upload
 
 
 def main():
@@ -9,7 +10,7 @@ def main():
 
     photo = upload.photo('your_photo.png') # Или upload.photo(open('your_photo.png', 'rb'))
 
-    vk.messages_send(user_id=121930743, attachment=photo)
+    vk.messages_send(user_id=1234567890, attachment=photo)
 
 
 if __name__ == '__main__':

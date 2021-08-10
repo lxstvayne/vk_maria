@@ -1,4 +1,5 @@
 from .api import Vk
+from .types import Message
 
 from requests.exceptions import ReadTimeout
 from enum import Enum
@@ -7,7 +8,8 @@ import re
 
 from loguru import logger
 import sys
-from typing import Union, List
+
+import typing
 
 logger.remove()
 logger.add(sys.stdout,
@@ -89,49 +91,32 @@ class EventType(Enum):
 
 
 class Event:
+    def __init__(self, vk, raw):
 
-    def __init__(self, raw):
+        self.vk = vk
+        self.fields = {}
 
         try:
             self.type = EventType(raw['type'])
         except ValueError:
             self.type = raw['type']
 
+        self.fields.update({'type': self.type})
+
         for k, v in raw['object'].items():
-            self.__dict__.update({k: DotDict(v) if isinstance(v, dict) else v})
+            self.fields.update({k: DotDict(v) if isinstance(v, dict) else v})
+
+        self.__dict__.update(self.fields)
 
         self.group_id = raw['group_id']
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}({", ".join(f"{k}={v}" for k, v in self.__dict__.items())})>'
+        return f'<{self.__class__.__name__}({", ".join(f"{k}={v}" for k, v in self.fields.items())})>'
 
 
-class Message(DotDict):
-    date: int
-    from_id: int
-    id: int
-    out: int
-    peer_id: int
-    text: str
-    conversation_message_id: int
-    fwd_messages: list
-    important: bool
-    random_id: int
-    attachments: list
-    is_hidden: bool
-
-
-class MessageEvent(Event):
-
-    message: Message
-    from_user: bool
-    from_chat: bool
-    from_group: bool
-    chat_id: Union[int, None]
-    peer_id: int = None
-
-    def __init__(self, raw):
-        super().__init__(raw)
+class MessageEvent(Event, Message):
+    def __init__(self, vk, raw):
+        super().__init__(vk, raw)
 
         self.from_user = False
         self.from_chat = False
@@ -147,6 +132,21 @@ class MessageEvent(Event):
         else:
             self.from_chat = True
             self.chat_id = peer_id - CHAT_START_ID
+
+    def answer(self, message: str = None, **kwargs):
+        if self.from_user:
+            kwargs.update(user_id=self.message.from_id)
+        elif self.from_chat:
+            kwargs.update(peer_id=self.message.peer_id)
+        elif self.from_group:
+            kwargs.update(peer_id=self.message.from_id)
+
+        self.vk.messages_send(message=message, **kwargs)
+
+    def reply(self, message: str = None, **kwargs):
+        kwargs.update(reply_to=self.message.conversation_message_id)
+        self.answer(message=message, **kwargs)
+
 
 class LongPoll:
 
@@ -175,7 +175,7 @@ class LongPoll:
             raw_event['type'],
             self.DEFAULT_EVENT_CLASS
         )
-        return event_class(raw_event)
+        return event_class(self.vk, raw_event)
 
     def _check(self):
         response = self.vk.method(server=self.server, key=self.key, ts=self.ts, wait=self.wait, act='a_check')
@@ -246,24 +246,22 @@ class LongPoll:
     poll = []
 
     def event_handler(self,
-                      commands: List = None,
-                      frm: str = 'user',
-                      event_type: EventType = EventType.MESSAGE_NEW,
-                      regexp: str = None
+                      event_type: EventType,
+                      **kwargs
                       ):
 
         def decorator(func):
-
-            filters = dict(commands=commands, frm=frm, event_type=event_type, regexp=regexp)
-
-            handler_dict = self._build_handler_dict(
-                handler=func,
-                **filters
-            )
-
+            handler_dict = self._build_handler_dict(handler=func, event_type=event_type, **kwargs)
             self._add_handler(handler_dict)
 
         return decorator
+
+    def message_handler(self,
+                        commands: typing.List[str] = None,
+                        frm: str = 'user',
+                        regexp: str = None,
+                        ):
+        return self.event_handler(event_type=EventType.MESSAGE_NEW, commands=commands, frm=frm, regexp=regexp)
 
     def polling(self, debug=False):
         for event in self.listen():
@@ -271,7 +269,7 @@ class LongPoll:
             if debug:
                 logger.info(event)
 
-            for message_handler in self.poll:
-                if self._test_handler(message_handler['filters'], event):
-                    message_handler['function'](event)
+            for handler in self.poll:
+                if self._test_handler(handler['filters'], event):
+                    handler['function'](event)
                     break
