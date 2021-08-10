@@ -12,7 +12,7 @@ class KeyboardAssociator:
     """
     Объект, через который можно обращаться к клавиатурам из моделей или папки.
 
-    :param module: Файл с моделями клавиатур.
+    :param models: Файл с моделями клавиатур.
     :param folder: Папка с файлами json клавиатур.
     """
 
@@ -40,14 +40,14 @@ class KeyboardAssociator:
 
         return keyboards
 
-    def __init__(self, module: str = None, folder: str = None):
-        self.KEYBOARDS_MODELS = module
+    def __init__(self, models: str = None, folder: str = None):
+        self.KEYBOARDS_MODELS = models
         self.KEYBOARDS_FOLDER = folder
         self.keyboards = {}
         if folder:
             self.keyboards.update(self.get_keyboards_from_files(folder))
-        if module:
-            self.keyboards.update(self.get_keyboards_from_models(module))
+        if models:
+            self.keyboards.update(self.get_keyboards_from_models(models))
 
     def __getitem__(self, keyboard_name):
         try:
@@ -55,5 +55,5 @@ class KeyboardAssociator:
         except KeyError:
             raise KeyboardNotFoundError('Not found')
 
-    def __getattr__(self, item):
-        return self.__getitem__(item)
+    def __getattr__(self, keyboard_name):
+        return self.__getitem__(keyboard_name)
