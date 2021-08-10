@@ -14,12 +14,14 @@
     * [Vk](#vk)
     * [LongPoll](#longpoll)
     * [Обработчики событий](#обработчики-событий)
+    * [Аннотации ивентов](#аннотации-ивентов)
     * [EventType](#eventtype)
     * [Upload](#upload)
     * [Клавиатуры](#клавиатуры)
-        * [Keyboards](#keyboards)
+        * [KeyboardAssociator](#keyboardassociator)
         * [Model](#model)
         * [Button](#button)
+        * [Color](#color)
 * [Постскриптум ](#постскриптум )
 ## Установка
 
@@ -139,7 +141,7 @@ def do_smth(event):
 longpoll.polling()
 ```
 ___
-#### Аннотация ивентов.
+#### Аннотации ивентов.
 Для удобной работы с ивентами, разработан модуль для ручной типизации ивентов - types. Он позволяет получать подсказки от вашей любимой IDE.
 ___
 #### Обработчики событий
@@ -190,14 +192,14 @@ ___
 
 Вы можете использовать ассоциации для отправки клавиатур.
 
-### Keyboards
+### KeyboardAssociator
 
 Чтобы создать ассоциации клавиатур необходимо создать экземпляр класса `KeyboardAssociator`:
 ```python
-keyboard = KeyboardAssociator(folder='keyboards', module='models')
+keyboard = KeyboardAssociator(folder='keyboards', models='models')
 ```
 * `folder` - папка с файлами клавиатур в формате `json`;
-* `module` - файл с расширением `.py`, хранящий модели клавиатур.
+* `models` - файл с расширением `.py`, хранящий модели клавиатур.
 
 Теперь вы можете получать клавиатуру вызвав `keyboard.keyboard_name` или `keyboard[keyboard_name]`, где `keyboard_name` - название вашей клавиатуры. 
 
@@ -257,7 +259,7 @@ class Empty(Model):
 ```
 Теперь можно импортировать наши модели в файл , в котором будем их использовать, либо создать объект ассоциаций:
 ```python
-keyboard = KeyboardAssociator(module='keyboards')
+keyboard = KeyboardAssociator(models='keyboards')
 ```
 Готово! Мы можем обращаться к нашим объектам клавиатур через `keyboard`:
 ```python
@@ -281,7 +283,7 @@ vk.messages_send(user_id='yourid', message='Скрываю клавиатуру'
 
 Подробнее о них вы можете прочитать в [официальной документации](https://vk.com/dev/bots_docs_3?f=4.2.%20%D0%A1%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%B0%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85)
 ### Color
-Доступные цвета: `PRIMARY`, `SECONDARY`, `NEGATIVE`, `POSITIVE`. 
+Перечисление. Доступные цвета: `PRIMARY`, `SECONDARY`, `NEGATIVE`, `POSITIVE`. 
 
 ## Постскриптум
 
