@@ -1,4 +1,5 @@
-from vk_maria import Vk, LongPoll
+from vk_maria import Vk
+from vk_maria.longpoll import LongPoll
 
 
 def main():
@@ -7,7 +8,7 @@ def main():
     vk = Vk(access_token='token')
     longpoll = LongPoll(vk)
 
-    @longpoll.event_handler(regexp=r'[\w\.-]+@[\w\.-]+(\.[\w]+)+')
+    @longpoll.message_handler(regexp=r'[\w\.-]+@[\w\.-]+(\.[\w]+)+')
     def email_check(event):
         print(f'Обнаружена почта в сообщении {event.message.text}')
 

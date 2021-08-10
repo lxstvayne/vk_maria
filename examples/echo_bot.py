@@ -1,4 +1,5 @@
-from vk_maria import Vk, LongPoll
+from vk_maria import Vk, types
+from vk_maria.longpoll import LongPoll
 
 
 def main():
@@ -7,9 +8,9 @@ def main():
     vk = Vk(access_token='token')
     longpoll = LongPoll(vk)
 
-    @longpoll.event_handler()
-    def echo(event):
-        vk.messages_send(user_id=event.message.from_id, message=event.message.text)
+    @longpoll.message_handler()
+    def echo(event: types.Message):
+        event.answer(event.message.text)
 
     longpoll.polling()
 

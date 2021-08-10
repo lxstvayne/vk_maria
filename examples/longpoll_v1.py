@@ -1,4 +1,5 @@
-from vk_maria import Vk, LongPoll, EventType
+from vk_maria import Vk
+from vk_maria.longpoll import LongPoll, EventType
 
 
 def main():

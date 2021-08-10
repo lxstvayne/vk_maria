@@ -14,12 +14,14 @@
     * [Vk](#vk)
     * [LongPoll](#longpoll)
     * [Обработчики событий](#обработчики-событий)
+    * [Аннотации ивентов](#аннотации-ивентов)
     * [EventType](#eventtype)
     * [Upload](#upload)
     * [Клавиатуры](#клавиатуры)
-        * [Keyboards](#keyboards)
+        * [KeyboardAssociator](#keyboardassociator)
         * [Model](#model)
         * [Button](#button)
+        * [Color](#color)
 * [Постскриптум ](#постскриптум )
 ## Установка
 
@@ -49,7 +51,8 @@ $ python setup.py install
 
 Создайте файл `echo_bot.py`. Откройте его и создайте экземпляр класса `Vk`:
 ```python
-from vk_maria import Vk, LongPoll
+from vk_maria import Vk, types
+from vk_maria.longpoll import LongPoll, EventType
 
 
 vk = Vk(access_token='token')
@@ -58,21 +61,21 @@ vk = Vk(access_token='token')
 
 Затем создайте экземпляр класса `LongPoll` передав ему в качестве аргумента `vk`:
 ```python
-longpoll = LongPoll(vk)
+lp = LongPoll(vk)
 ```
 После этого нам необходимо зарегистрировать обработчик событий. Обработчики событий определяют фильтры, которые должно пройти событие. Если событие проходит фильтры, вызывается декорированная функция и входящее событие передаётся в качестве аргумента.
 
 Давайте определим обработчик событий, который будет обрабатывать все входящие сообщения от пользователя в личные сообщения сообщества и отвечать на команду *Начать*:
 ```python
-@longpoll.event_handler(commands=['Начать'])
-def send_welcome(event):
+@lp.event_handler(event_type=EventType.MESSAGE_NEW, commands=['Начать'])
+def send_welcome(event: types.Message):
     vk.messages_send(user_id=event.message.from_id, message='Добро пожаловать!')
 ```
 Добавим ещё один обработчик:
 ```python
-@longpoll.event_handler()
-def echo(event):
-    vk.messages_send(user_id=event.message.from_id, message=event.message.text)
+@lp.event_handler(event_type=EventType.MESSAGE_NEW)
+def echo(event: types.Message):
+    event.answer(event.message.text)
 ```
 Декорированная функция может иметь произвольное имя, однако она должна принимать только 1 параметр (event).
 
@@ -84,37 +87,39 @@ longpoll.polling()
 ```
 Вот и всё! Наш исходный файл теперь выглядит так:
 ```python
-from vk_maria import Vk, LongPoll
+from vk_maria import Vk, types
+from vk_maria.longpoll import LongPoll, EventType
 
 
 vk = Vk(access_token='token')
-longpoll = LongPoll(vk)
+lp = LongPoll(vk)
 
-@longpoll.event_handler(commands=['Начать'])
-def send_welcome(event):
+@lp.event_handler(event_type=EventType.MESSAGE_NEW, commands=['Начать'])
+def send_welcome(event: types.Message):
     vk.messages_send(user_id=event.message.from_id, message='Добро пожаловать!')
 
-@longpoll.event_handler()
-def echo(event):
-    vk.messages_send(user_id=event.message.from_id, message=event.message.text)
+
+@lp.event_handler(event_type=EventType.MESSAGE_NEW)
+def echo(event: types.Message):
+    event.answer(event.message.text)
 
 
-longpoll.polling()
+lp.polling()
 ```
 Чтобы запустить бота, просто откройте терминал, введите `python echo_bot.py` и протестируйте его.
 
 ## Общая документация по библиотеке
 
-Все инструменты импортируются исключительно из пакета `vk_maria`.
+Все инструменты импортируются из своих пакетов.
 
-Доступные инструменты:
-* `Vk`
-* `LongPoll`
-* `EventType`
-* `Upload`
-* `Keyboards`
-* `Model`
-* `Button`
+|Пакет|Инструменты|
+|:---:|---|
+|`vk_maria`| `Vk`, `types`|
+|`vk_maria.longpoll`| `LongPoll`, `EventType`|
+|`vk_maria.keyboard`| `Model`, `Button`, `Color`, `KeyboardAssociator`|
+|`vk_maria.upload`| `Upload`|
+
+
 ___
 ### Vk
 
@@ -129,29 +134,35 @@ for event in longpoll.listen():
 ```
 Так и через удобный декоратор `event_handler`:
 ```python
-@longpoll.event_handler()
+@longpoll.event_handler(event_type=EventType.MESSAGE_NEW)
 def do_smth(event):
     ...
 
 longpoll.polling()
 ```
 ___
+#### Аннотации ивентов.
+Для удобной работы с ивентами, разработан модуль для ручной типизации ивентов - types. Он позволяет получать подсказки от вашей любимой IDE.
+___
 #### Обработчики событий
 
 Обработчик событий это функция с декоратором `event_handler()`. Он определяет фильтры для обрабатываемых событий.
 
 ```python
-@longpoll.event_handler(**filters)
+@longpoll.event_handler(event_type, **filters)
 def do_smth(event):
     ...
 ```
+
+Для удобной работы с сообщениями, существует декоратор `message_handler(**filters)`, в который по стандарту передаётся EventType.MESSAGE_NEW.
+
 Фильтр объявляется следующим образом `name=argument`.
 
 Доступные фильтры:
 
 |Название|Аргументы|Условие|
 |:---:|---| ---|
-|type|Тип события из EventType по умолчанию MESSAGE_NEW.|`True`, если типы событий совпадают.|
+|event_type|Тип события из `EventType`.|`True`, если типы событий совпадают.|
 |regexp|Регулярное выражение или подстрока.|`True`, если подстрока находится в сообщении или строка проходит проверку на наличие шаблона регулярного выражения (Подробнее [Python Regular Expressions](https://docs.python.org/2/library/re.html)).|
 |commands|Список с командами.|`True`, если текст сообщения совпадает с одной из команд.|
 |frm |От кого обрабатывать события (`'user'`, `'chat'`, `'group'`)  по умолчанию `'user'`.|`True`, если поле from_(`user`, `chat`, `group`) соответсвенно `True`.
@@ -162,6 +173,8 @@ ___
 ### EventType
 
 `EventType` представляет из себя перечисление всех возможных событий. К примеру `MESSAGE_NEW`, `MESSAGE_TYPING_STATE`, `MESSAGE_REPLY`...
+
+События типа `MESSAGE_NEW` по стандарту имеют методы `answer` и `reply`.
 ___
 ### Upload
 
@@ -179,16 +192,16 @@ ___
 
 Вы можете использовать ассоциации для отправки клавиатур.
 
-### Keyboards
+### KeyboardAssociator
 
-Чтобы создать ассоциации клавиатур необходимо создать экземпляр класса `Keyboards`:
+Чтобы создать ассоциации клавиатур необходимо создать экземпляр класса `KeyboardAssociator`:
 ```python
-kbs = Keyboards(folder='keyboards', models='models')
+keyboard = KeyboardAssociator(folder='keyboards', models='models')
 ```
 * `folder` - папка с файлами клавиатур в формате `json`;
 * `models` - файл с расширением `.py`, хранящий модели клавиатур.
 
-Теперь вы можете получать клавиатуру вызвав `kbs(keyboard)`, где `keyboard` - название вашей клавиатуры. 
+Теперь вы можете получать клавиатуру вызвав `keyboard.keyboard_name` или `keyboard[keyboard_name]`, где `keyboard_name` - название вашей клавиатуры. 
 
 ### Model
 
@@ -196,9 +209,9 @@ kbs = Keyboards(folder='keyboards', models='models')
 
 Пример:
 
-Создадим файл `keyboards.py`, где будут храниться наши модели. Импортируем `Model` и `Button`:
+Создадим файл `keyboards.py`, где будут храниться наши модели. Импортируем `Model`, `Button`, `Color`:
 ```python
-from vk_maria import Model, Button
+from vk_maria.keyboard import Model, Button, Color
 ```
 Теперь необходимо определить свои модели. Для этого необходимо создать классы, родителями которых будет `Model`:
 ```python
@@ -207,53 +220,55 @@ class TestKeyboard(Model):
     one_time = True
 
     row1 = [
-        Button.Text(color='primary', label='Кнопка 1'), Button.Text(color='primary', label='Кнопка 2')
+        Button.Text(Color.PRIMARY, 'Кнопка 1'), 
+        Button.Text(Color.PRIMARY, 'Кнопка 2')
     ]
     row2 = [
-        Button.Text(color='primary', label='Кнопка 3'), Button.Text(color='primary', label='Кнопка 4')
+        Button.Text(Color.PRIMARY, 'Кнопка 3'), 
+        Button.Text(Color.PRIMARY, 'Кнопка 4')
     ]
 
 
 class Calculator(Model):
 
     row1 = [
-        Button.Text(color='primary', label='1'),
-        Button.Text(color='primary', label='2'),
-        Button.Text(color='primary', label='3')
+        Button.Text(Color.PRIMARY, '1'),
+        Button.Text(Color.PRIMARY, '2'),
+        Button.Text(Color.PRIMARY, '3')
     ]
 
     row2 = [
-        Button.Text(color='primary', label='4'),
-        Button.Text(color='primary', label='5'),
-        Button.Text(color='primary', label='6')
+        Button.Text(Color.PRIMARY, '4'),
+        Button.Text(Color.PRIMARY, '5'),
+        Button.Text(Color.PRIMARY, '6')
     ]
 
     row3 = [
-        Button.Text(color='primary', label='7'),
-        Button.Text(color='primary', label='8'),
-        Button.Text(color='primary', label='9')
+        Button.Text(Color.PRIMARY, '7'),
+        Button.Text(Color.PRIMARY, '8'),
+        Button.Text(Color.PRIMARY, '9')
     ]
 
     row4 = [
-        Button.Text(color='primary', label='0')
+        Button.Text(Color.PRIMARY, '0')
     ]
 
 
 class Empty(Model):
     pass
 ```
-Теперь необходимо создать объект типа `Keyboards` и указать в нём название файла с нашими моделями:
+Теперь можно импортировать наши модели в файл , в котором будем их использовать, либо создать объект ассоциаций:
 ```python
-kbs = Keyboards(models='keyboards')
+keyboard = KeyboardAssociator(models='keyboards')
 ```
-Готово! Мы можем обращаться к нашим объектам клавиатур через `kbs`:
+Готово! Мы можем обращаться к нашим объектам клавиатур через `keyboard`:
 ```python
-vk.messages_send(user_id='yourid', message='Разовая клавиатура', keyboard=kbs('TestKeyboard')
-vk.messages_send(user_id='yourid', message='Инлайн клавиатура', keyboard=kbs('Calculator')
+vk.messages_send(user_id='yourid', message='Разовая клавиатура', keyboard=keyboard.TestKeyboard
+vk.messages_send(user_id='yourid', message='Инлайн клавиатура', keyboard=Calculator
 ```
 Если необходимо скрыть клавиатуру у пользователя, отправьте пустую модель:
 ```python
-vk.messages_send(user_id='yourid', message='Скрываю клавиатуру', keyboard=kbs('Empty')
+vk.messages_send(user_id='yourid', message='Скрываю клавиатуру', keyboard=Empty
 ```
 
 ### Button
@@ -267,8 +282,12 @@ vk.messages_send(user_id='yourid', message='Скрываю клавиатуру'
 * `Callback`
 
 Подробнее о них вы можете прочитать в [официальной документации](https://vk.com/dev/bots_docs_3?f=4.2.%20%D0%A1%D1%82%D1%80%D1%83%D0%BA%D1%82%D1%83%D1%80%D0%B0%20%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85)
+### Color
+Перечисление. Доступные цвета: `PRIMARY`, `SECONDARY`, `NEGATIVE`, `POSITIVE`. 
 
 ## Постскриптум
 
 Я старался написать простую и удобную библиотеку.
 Если у вас есть идеи по её улучшению, вы можете отправить письмо мне на почту lxstv4yne@gmail.com.
+
+Очень большой мотивацией для меня будут ваши донаты.
