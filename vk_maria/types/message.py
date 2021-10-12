@@ -2,7 +2,6 @@ import typing
 from pydotdict import DotDict
 
 
-
 class BaseEvent:
     type: str
 
@@ -37,11 +36,11 @@ class Message(BaseEvent):
                intent: str = 'default', subscribe_id: int = None): pass
 
     def reply(self, message: str = None, domain: str = None, lat: float = None,
-               long: float = None, attachment=None, reply_to: int = None, forward_messages: typing.List[int] = None,
-               forward=None, sticker_id: int = None, keyboard=None, template: typing.Dict = None, payload=None,
-               content_source: typing.Dict = None, dont_parse_links: int = None, disable_mentions: int = None,
-               intent: str = 'default', subscribe_id: int = None):
-        '''
+              long: float = None, attachment=None, reply_to: int = None, forward_messages: typing.List[int] = None,
+              forward=None, sticker_id: int = None, keyboard=None, template: typing.Dict = None, payload=None,
+              content_source: typing.Dict = None, dont_parse_links: int = None, disable_mentions: int = None,
+              intent: str = 'default', subscribe_id: int = None):
+        """
         Не работает в беседах из-за ограниченного апи
-        '''
+        """
         pass
