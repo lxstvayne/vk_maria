@@ -1,4 +1,4 @@
-from .longpoll import LongPoll
+from .storage import FSMContext
 
 __all__ = ('State', 'StatesGroup')
 
@@ -12,8 +12,8 @@ class State:
         return self._state
 
     def set(self):
-        state = LongPoll.get_current().current_context()
-        state.set_state(self._state)
+        context = FSMContext.get_current()
+        context.set_state(self._state)
 
     def __eq__(self, other):
         return self.state == other
@@ -41,7 +41,7 @@ class StatesGroupMeta(type):
 class StatesGroup(metaclass=StatesGroupMeta):
     @classmethod
     def next(cls):
-        context = LongPoll.get_current().current_context()
+        context = FSMContext.get_current()
         state = context.get_state()
 
         try:
@@ -54,12 +54,12 @@ class StatesGroup(metaclass=StatesGroupMeta):
         except IndexError:
             next_state_name = None
 
-        context.set_state(next_state_name)
+        state.set_state(next_state_name)
         return next_state_name
 
     @classmethod
     def previous(cls) -> str:
-        context = LongPoll.get_current().current_context()
+        context = FSMContext.get_current()
         state = context.get_state()
 
         try:
@@ -77,19 +77,19 @@ class StatesGroup(metaclass=StatesGroupMeta):
 
     @classmethod
     def first(cls) -> str:
-        context = LongPoll.get_current().current_context()
+        context = FSMContext.get_current()
         first_step_name = cls._state_names[0]
         context.set_state(first_step_name)
         return first_step_name
 
     @classmethod
     def last(cls) -> str:
-        context = LongPoll.get_current().current_context()
+        context = FSMContext.get_current()
         last_step_name = cls._state_names[-1]
         context.set_state(last_step_name)
         return last_step_name
 
     @classmethod
     def finish(cls):
-        context = LongPoll.get_current().current_context()
+        context = FSMContext.get_current()
         context.finish()

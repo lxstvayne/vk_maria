@@ -1,2 +1,2 @@
-from ...longpoll.storage import DisabledStorage, BaseStorage, MemoryStorage, FSMContext
-from ..state import StatesGroup, State
+from .state import State, StatesGroup
+from .storage import BaseStorage, MemoryStorage, DisabledStorage, FSMContext

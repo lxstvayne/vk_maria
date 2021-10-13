@@ -31,4 +31,5 @@ class Message:
                keyboard=None, template: Dict = None, payload=None, content_source: Dict = None,
                dont_parse_links: int = None, disable_mentions: int = None, intent: str = 'default',
                subscribe_id: int = None): pass
+
     def reply(self): pass

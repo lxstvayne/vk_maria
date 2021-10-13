@@ -1,14 +1,11 @@
 from .types import EventType
 from .types import Event, MessageEvent
 from ..api import Vk
-from ..longpoll.mixins import ContextInstanceMixin
-from .storage import DisabledStorage
-from .storage import BaseStorage, FSMContext
-from ..longpoll.types import Chat
+from .fsm import DisabledStorage, BaseStorage, FSMContext
+from .fsm.types import Chat
 
 from requests.exceptions import ReadTimeout
 import re
-from functools import partial
 
 from loguru import logger
 import sys
@@ -23,50 +20,7 @@ logger.add(sys.stdout,
            )
 
 
-class FiltersFactory:
-    def __init__(self, lp):
-        self.lp = lp
-
-    def bind(self, handler_filters: dict):
-        filters_ = {
-            'event_type': lambda event_type, event: event.type is event_type,
-            'frm': lambda frm, event: getattr(event, f'from_{frm}'),
-            'commands': lambda commands, event: event.message.text in commands,
-            'regexp': lambda regexp, event: re.search(regexp, event.message.text, re.IGNORECASE),
-            'state': lambda state, event: (hasattr(LongPoll, '_context')
-                                           and state == self.lp.current_context().get_state()
-                                           ) or state == '*'
-        }
-
-        filters = {}
-
-        for filter_name, filter_value in handler_filters.items():
-            if filter_value:
-                # if not filters_[filter_name](filter_value, event):
-                #     return False
-                filters[filter_name] = filters_[filter_name]
-
-        return filters
-
-
-class HandlerObject:
-    def __init__(self,
-                 func,
-                 **filters):
-        self.function = func
-        self.filters = filters
-
-    def test_handler(self, handle_value, event):
-        for filter_name, filter_value in self.filters.items():
-            if filter_name != handle_value:
-                pass
-            if not filter_value(handle_value, event):
-                return False
-
-        return True
-
-
-class LongPoll(ContextInstanceMixin):
+class LongPoll:
     __CLASS_BY_EVENT_TYPE = {
         EventType.MESSAGE_NEW.value: MessageEvent,
         EventType.MESSAGE_REPLY.value: MessageEvent,
@@ -80,6 +34,7 @@ class LongPoll(ContextInstanceMixin):
     def __init__(self, vk: Vk, storage: typing.Optional[BaseStorage] = DisabledStorage()):
         self._vk = vk
         self._storage = storage
+        FSMContext(storage)
 
         self._wait = 25
         self._key, self._server, self._ts = self._vk.groups_get_longpoll_server().values()
@@ -126,14 +81,6 @@ class LongPoll(ContextInstanceMixin):
 
     # Polling
 
-    def current_context(self):
-        return self._context
-
-    def _update_state(self, *,
-                      chat: typing.Union[int, None],
-                      user: typing.Union[int, None]):
-        self._context = FSMContext(storage=self._storage, chat=chat, user=user)
-
     def _add_handler(self, handler_dict):
         self.__poll.append(handler_dict)
 
@@ -145,18 +92,15 @@ class LongPoll(ContextInstanceMixin):
         }
 
     def _test_handler(self, handler_filters, event):
-
         handle_result = False
         event_type = handler_filters.get('event_type')
-        chat, user = Chat.resolve_address(event)
-
-        # factory = FiltersFactory(self)
-        # if factory.test(handler_filters, event):
-        #     handle_result = True
+        chat_id, user_id = Chat.resolve_address(event)
 
         if event.type is event_type:
 
             if event_type is EventType.MESSAGE_NEW:
+                Chat.set(chat_id=chat_id, user_id=user_id)
+
                 commands = handler_filters.get('commands')
                 frm = handler_filters.get('frm')
                 regexp = handler_filters.get('regexp')
@@ -176,7 +120,7 @@ class LongPoll(ContextInstanceMixin):
                         handle_result = True
 
                 if state:
-                    if hasattr(self, '_context') and state == self._context.get_state():
+                    if state == FSMContext.get_current().get_state():
                         handle_result = True
                     elif state == '*':
                         handle_result = True
@@ -187,7 +131,6 @@ class LongPoll(ContextInstanceMixin):
                 handle_result = True
 
         if handle_result:
-            self._update_state(chat=chat, user=user)
             return True
 
     def event_handler(self,
@@ -221,7 +164,7 @@ class LongPoll(ContextInstanceMixin):
                 if self._test_handler(handler['filters'], event):
                     handler = handler['function']
                     if handler.__code__.co_argcount == 2:
-                        handler(event, self._context)
+                        handler(event, FSMContext.get_current())
                     else:
                         handler(event)
                     break

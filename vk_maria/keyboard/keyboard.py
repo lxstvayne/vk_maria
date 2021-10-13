@@ -129,5 +129,3 @@ def construct_json(model_dict):
             [unpack_button(button) for button in row] for row in rows
         ]
     })
-
-

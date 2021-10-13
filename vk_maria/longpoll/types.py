@@ -1,10 +1,8 @@
-import typing
 from enum import Enum
 
 from pydotdict import DotDict
 
 from ..types import Message
-from .mixins import ContextInstanceMixin
 
 
 CHAT_START_ID = int(2E9)
@@ -136,36 +134,3 @@ class MessageEvent(Event, Message):
     def reply(self, message: str = None, **kwargs):
         kwargs.update(reply_to=self.message.conversation_message_id)
         self.answer(message=message, **kwargs)
-
-
-class Chat(ContextInstanceMixin):
-    def __init__(self,
-                 chat_id: typing.Union[int, None] = None,
-                 user_id: typing.Union[int, None] = None):
-        self.chat_id = chat_id
-        self.user_id = user_id
-
-    @property
-    def get_chat_id(self):
-        return self.chat_id
-
-    @property
-    def get_user_id(self):
-        return self.chat_id
-
-    def set_id(self, chat_id: int, user_id: int):
-        self.chat_id = chat_id
-        self.user_id = user_id
-
-    @staticmethod
-    def resolve_address(event: Event) -> (typing.Union[int, None], typing.Union[int, None]):
-        chat, user = None, None
-
-        if event.type is EventType.MESSAGE_NEW:
-            user = event.fields['message'].get('from_id')
-            chat = event.fields['message'].get('peer_id')
-        elif event.type is EventType.MESSAGE_EVENT:
-            user = event.fields.get('user_id')
-            chat = event.fields.get('peer_id')
-
-        return chat, user

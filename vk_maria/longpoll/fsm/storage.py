@@ -2,6 +2,11 @@ import typing
 from abc import ABC, abstractmethod
 import copy
 
+from loguru import logger
+
+from ..mixins import ContextInstanceMixin
+from .types import Chat
+
 
 class BaseStorage(ABC):
 
@@ -82,34 +87,33 @@ class BaseStorage(ABC):
         self.reset_state(chat=chat, user=user, with_data=True)
 
 
-class FSMContext:
-    def __init__(self, storage: BaseStorage, chat, user):
+class FSMContext(ContextInstanceMixin):
+    def __init__(self, storage: BaseStorage):
         self.storage: BaseStorage = storage
-        self.chat, self.user = self.storage.check_address(chat=chat, user=user)
 
     def get_state(self, default: typing.Optional[str] = None) -> typing.Optional[str]:
-        return self.storage.get_state(chat=self.chat, user=self.user, default=default)
+        return self.storage.get_state(chat=Chat.get_chat_id(), user=Chat.get_user_id(), default=default)
 
     def get_data(self, default: typing.Optional[str] = None) -> typing.Dict:
-        return self.storage.get_data(chat=self.chat, user=self.user, default=default)
+        return self.storage.get_data(chat=Chat.get_chat_id(), user=Chat.get_user_id(), default=default)
 
     def update_data(self, data: typing.Dict = None, **kwargs):
-        self.storage.update_data(chat=self.chat, user=self.user, data=data, **kwargs)
+        self.storage.update_data(chat=Chat.get_chat_id(), user=Chat.get_user_id(), data=data, **kwargs)
 
     def set_state(self, state: typing.Optional[typing.AnyStr] = None):
-        self.storage.set_state(chat=self.chat, user=self.user, state=state)
+        self.storage.set_state(chat=Chat.get_chat_id(), user=Chat.get_user_id(), state=state)
 
     def set_data(self, data: typing.Dict = None):
-        self.storage.set_data(chat=self.chat, user=self.user, data=data)
+        self.storage.set_data(chat=Chat.get_chat_id(), user=Chat.get_user_id(), data=data)
 
     def reset_state(self, with_data: typing.Optional[bool] = True):
-        self.storage.reset_state(chat=self.chat, user=self.user, with_data=with_data)
+        self.storage.reset_state(chat=Chat.get_chat_id(), user=Chat.get_user_id(), with_data=with_data)
 
     def reset_data(self):
-        self.storage.reset_data(chat=self.chat, user=self.user)
+        self.storage.reset_data(chat=Chat.get_chat_id(), user=Chat.get_user_id(), )
 
     def finish(self):
-        self.storage.finish(chat=self.chat, user=self.user)
+        self.storage.finish(chat=Chat.get_chat_id(), user=Chat.get_user_id(), )
 
 
 class MemoryStorage(BaseStorage):
@@ -225,4 +229,4 @@ class DisabledStorage(BaseStorage):
         self._warning()
 
     def _warning(self):
-        print('Вы не указали хранилище состояний')
+        logger.warning('Вы не указали хранилище состояний')
