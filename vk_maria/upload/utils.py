@@ -1,8 +1,8 @@
-from .. import working_dir
-from .exceptions import *
-
-from typing import Union, List, BinaryIO
 from _io import BufferedReader
+from typing import Union, List, BinaryIO
+
+from .exceptions import *
+from .. import working_dir
 
 
 def open_file(file: Union[str, BinaryIO]):

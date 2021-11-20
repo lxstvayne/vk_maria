@@ -1,16 +1,16 @@
 import json
+import random
 import threading
 import time
-import random
 
 from pydotdict import DotDict
 
-from .keyboard import Model
 from .exceptions import VkMariaException
+from .keyboard import KeyboardModel
+from .keyboard.keyboard import KeyboardMarkup
 
 
 def error_catcher(method):
-
     def wrapper(self, *args, **kwargs):
         response = method(self, *args, **kwargs)
         e = response[1].get('error')
@@ -24,7 +24,6 @@ def error_catcher(method):
 
 
 def query_delimiter(method):
-
     def wrapper(self, *args, **kwargs):
         with threading.Lock():
             delay = self.rps_delay - (time.time() - self.last_request)
@@ -38,11 +37,10 @@ def query_delimiter(method):
 
 
 def get_random_id():
-    return random.randint(-2**31, 2**31 - 1)
+    return random.randint(-2 ** 31, 2 ** 31 - 1)
 
 
 def response_parser(method):
-
     # Которые должны получать не список, а 1 объект
     # Только те которые возвращают список из 1 элемента, а не дикт
     fix_methods = [
@@ -67,7 +65,6 @@ def response_parser(method):
 
 
 def args_converter(method):
-
     def wrapper(self, *args, **kwargs):
         for keyword, value in kwargs.items():
 
@@ -78,8 +75,12 @@ def args_converter(method):
                 kwargs[keyword] = ','.join(str(el) for el in value)
             elif keyword == 'forward_messages':
                 kwargs[keyword] = ','.join(str(el) for el in value)
-            elif keyword == 'keyboard' and not isinstance(value, str) and issubclass(value, Model):
-                kwargs[keyword] = value.__json__
+            elif keyword == 'keyboard':
+                if not isinstance(value, str):
+                    if isinstance(value, KeyboardMarkup):
+                        kwargs[keyword] = value.get_json()
+                    elif issubclass(value, KeyboardModel):
+                        kwargs[keyword] = value.__json__
             elif keyword == 'fields':
                 kwargs[keyword] = ','.join(value)
             elif keyword == 'message_ids':

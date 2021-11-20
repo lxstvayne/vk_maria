@@ -1,9 +1,8 @@
 from os import PathLike
+from typing import Union, List, BinaryIO
 
 from .utils import open_files
 from ..api import Vk
-
-from typing import Union, List, BinaryIO
 
 
 class Upload:

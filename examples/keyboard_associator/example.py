@@ -1,10 +1,10 @@
 from vk_maria import Vk, types
 from vk_maria.longpoll import LongPoll
-from vk_maria.keyboard import Model, Button, Color, KeyboardAssociator
+from vk_maria.keyboard import KeyboardModel, Button, Color, KeyboardAssociator
 import random
 
 
-class MyKeyboard(Model):
+class MyKeyboard(KeyboardModel):
     inline = True
     # Очень важно перечислять строки с ключевого слова row и по порядку.
     row1 = [

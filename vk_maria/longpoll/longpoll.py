@@ -1,16 +1,14 @@
-from .types import EventType
-from .types import Event, MessageEvent
-from ..api import Vk
-from .fsm import DisabledStorage, BaseStorage, FSMContext
-from .fsm.types import Chat
-
-from requests.exceptions import ReadTimeout
-import re
+import sys
+import typing
 
 from loguru import logger
-import sys
+from requests.exceptions import ReadTimeout
 
-import typing
+from .filters.handler import HandlerManager
+from .fsm import DisabledStorage, BaseStorage, FSMContext
+from .fsm.types import Chat
+from .types import Event, MessageEvent, EventType
+from ..api import Vk
 
 logger.remove()
 logger.add(sys.stdout,
@@ -34,6 +32,7 @@ class LongPoll:
     def __init__(self, vk: Vk, storage: typing.Optional[BaseStorage] = DisabledStorage()):
         self._vk = vk
         self._storage = storage
+        self._handler_manager = HandlerManager()
         FSMContext(storage)
 
         self._wait = 25
@@ -79,80 +78,58 @@ class LongPoll:
             except ReadTimeout:
                 pass
 
-    # Polling
+    def register_event_handler(self,
+                               function: callable,
+                               event_type: EventType,
+                               *filters,
+                               **bound_filters):
+        bound_filters = {k: v for k, v in bound_filters.items() if v}
+        self._handler_manager.register_handler(function, event_type=event_type, *filters, **bound_filters)
 
-    def _add_handler(self, handler_dict):
-        self.__poll.append(handler_dict)
-
-    @staticmethod
-    def _build_handler_dict(handler, **filters):
-        return {
-            'function': handler,
-            'filters': filters
-        }
-
-    def _test_handler(self, handler_filters, event):
-        handle_result = False
-        event_type = handler_filters.get('event_type')
-        chat_id, user_id = Chat.resolve_address(event)
-
-        if event.type is event_type:
-
-            if event_type is EventType.MESSAGE_NEW:
-                Chat.set(chat_id=chat_id, user_id=user_id)
-
-                commands = handler_filters.get('commands')
-                frm = handler_filters.get('frm')
-                regexp = handler_filters.get('regexp')
-                state = handler_filters.get('state')
-
-                type_from = getattr(event, f'from_{frm}')
-                message = event.message
-
-                if type_from:
-                    if commands:
-                        if message.text in commands:
-                            handle_result = True
-                    elif regexp:
-                        if re.search(regexp, message.text, re.IGNORECASE):
-                            handle_result = True
-                    else:
-                        handle_result = True
-
-                if state:
-                    if state == FSMContext.get_current().get_state():
-                        handle_result = True
-                    elif state == '*':
-                        handle_result = True
-                    else:
-                        handle_result = False
-
-            elif event_type in EventType:
-                handle_result = True
-
-        if handle_result:
-            return True
+    def register_message_handler(self,
+                                 function: callable,
+                                 *filters,
+                                 commands: typing.List[str] = None,
+                                 frm: str = 'user',
+                                 regexp: str = None,
+                                 state=None,
+                                 **kwargs):
+        self.register_event_handler(function,
+                                    EventType.MESSAGE_NEW,
+                                    *filters,
+                                    commands=commands,
+                                    frm=frm,
+                                    regexp=regexp,
+                                    state=state,
+                                    **kwargs)
 
     def event_handler(self,
                       event_type: EventType,
-                      **kwargs):
+                      *filters,
+                      **bound_filters):
+        def wrapper(callback):
+            self.register_event_handler(callback, event_type, *filters, **bound_filters)
 
-        def decorator(func):
-            handler_dict = self._build_handler_dict(handler=func, event_type=event_type, **kwargs)
-            self._add_handler(handler_dict)
-
-        return decorator
+        return wrapper
 
     def message_handler(self,
+                        *filters,
                         commands: typing.List[str] = None,
                         frm: str = 'user',
                         regexp: str = None,
                         state=None):
-        return self.event_handler(event_type=EventType.MESSAGE_NEW,
+        return self.event_handler(EventType.MESSAGE_NEW,
+                                  *filters,
                                   commands=commands,
                                   frm=frm,
                                   regexp=regexp,
                                   state=state)
+
+    @staticmethod
+    def _update_chat_context(event):
+        chat_id, user_id = Chat.resolve_address(event)
+        if event.type == EventType.MESSAGE_NEW:
+            Chat.set(chat_id, user_id)
 
     def polling(self, debug=False):
         for event in self.listen():
@@ -160,11 +137,9 @@ class LongPoll:
             if debug:
                 logger.info(event)
 
-            for handler in self.__poll:
-                if self._test_handler(handler['filters'], event):
-                    handler = handler['function']
-                    if handler.__code__.co_argcount == 2:
-                        handler(event, FSMContext.get_current())
-                    else:
-                        handler(event)
+            self._update_chat_context(event)
+
+            for handler in self._handler_manager.handlers:
+                if handler.test_handler(event):
+                    handler(event)
                     break

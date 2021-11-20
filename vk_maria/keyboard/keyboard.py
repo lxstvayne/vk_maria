@@ -1,8 +1,5 @@
-from enum import Enum
-
 import json
-
-
+from enum import Enum
 from typing import List
 
 
@@ -10,6 +7,7 @@ class Button:
     """
     Объект описывающий одну из кнопок.
     """
+
     class Text:
         type = 'text'
 
@@ -84,16 +82,15 @@ class Color(str, Enum):
     POSITIVE = 'positive'
 
 
-class ModelMeta(type):
+class KeyboardModelMeta(type):
     def __new__(cls, name, bases, namespace):
-
         if bases:
             namespace['__json__'] = construct_json(namespace)
 
         return super().__new__(cls, name, bases, namespace)
 
 
-class Model(metaclass=ModelMeta):
+class KeyboardModel(metaclass=KeyboardModelMeta):
     """
     Объект описывающий клавиатуру.
     """
@@ -129,3 +126,23 @@ def construct_json(model_dict):
             [unpack_button(button) for button in row] for row in rows
         ]
     })
+
+
+class KeyboardMarkup:
+    def __init__(self, inline: bool = False, one_time: bool = False):
+        self.__current_row = 0
+        self.__keyboard_dict__ = {'buttons': [[], ],
+                                  'inline': inline,
+                                  'one_time': one_time}
+
+    def add_button(self, button):
+        self.__keyboard_dict__['buttons'][self.__current_row].append(button)
+
+    def add_row(self):
+        self.__current_row += 1
+        self.__keyboard_dict__['buttons'].append([])
+
+    def get_json(self):
+        __json__ = self.__keyboard_dict__.copy()
+        __json__['buttons'] = [[unpack_button(button) for button in row] for row in __json__['buttons'] if row]
+        return json.dumps(__json__)

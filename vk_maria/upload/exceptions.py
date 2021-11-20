@@ -1,5 +1,2 @@
-
-
-
 class InvalidFileFormatError(Exception):
     pass

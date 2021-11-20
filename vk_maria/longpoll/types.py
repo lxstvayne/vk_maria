@@ -4,7 +4,6 @@ from pydotdict import DotDict
 
 from ..types import Message
 
-
 CHAT_START_ID = int(2E9)
 
 
@@ -132,5 +131,5 @@ class MessageEvent(Event, Message):
         self.vk.messages_send(message=message, **kwargs)
 
     def reply(self, message: str = None, **kwargs):
-        kwargs.update(reply_to=self.message.conversation_message_id)
+        kwargs.update(reply_to=self.message.id)
         self.answer(message=message, **kwargs)

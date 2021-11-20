@@ -1,7 +1,7 @@
-from .utils import error_catcher, query_delimiter, get_random_id, response_parser, args_converter
-from .responses import *
-
 import requests
+
+from .responses import *
+from .utils import error_catcher, query_delimiter, get_random_id, response_parser, args_converter
 
 
 class ApiMethod:

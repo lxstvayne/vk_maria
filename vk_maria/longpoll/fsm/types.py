@@ -1,6 +1,6 @@
-from ..types import Event, EventType
-
 import typing
+
+from ..types import Event, EventType
 
 
 class Chat:

@@ -1,11 +1,11 @@
+import copy
 import typing
 from abc import ABC, abstractmethod
-import copy
 
 from loguru import logger
 
-from ..mixins import ContextInstanceMixin
 from .types import Chat
+from ..mixins import ContextInstanceMixin
 
 
 class BaseStorage(ABC):

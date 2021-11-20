@@ -1,10 +1,9 @@
 import inspect
-import json
 import os
 import sys
 
 from .exceptions import *
-from .keyboard import construct_json, Model
+from .keyboard import construct_json, KeyboardModel
 from .. import working_dir
 
 
@@ -31,7 +30,7 @@ class KeyboardAssociator:
         module = __import__(models)
         keyboard_models = []
         for keyboard in inspect.getmembers(sys.modules[module.__name__], inspect.isclass):
-            if Model in keyboard[1].__bases__:
+            if KeyboardModel in keyboard[1].__bases__:
                 keyboard_models.append(keyboard[1])
 
         keyboards = {}

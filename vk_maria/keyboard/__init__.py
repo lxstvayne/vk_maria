@@ -1,6 +1,9 @@
 from .associator import KeyboardAssociator
-from .keyboard import Model, Button, Color
+from .keyboard import KeyboardModel, KeyboardMarkup, Button, Color
 
+
+class EmptyKeyboard(KeyboardModel):
+    pass
 
 
 def gen_keyboard(keyboard_name: str, keyboard: dict) -> str:
