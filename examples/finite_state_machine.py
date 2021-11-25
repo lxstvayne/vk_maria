@@ -4,7 +4,7 @@ from vk_maria.longpoll.fsm import StatesGroup, State, MemoryStorage, FSMContext
 from vk_maria.keyboard import KeyboardMarkup, Button, Color, EmptyKeyboard
 
 
-vk = Vk(access_token='bbb36ccd7cc314f50a51c7b0d8bc11d31056f7c431d12d726933d2100a9a56ecb39615ca86eef5bb807be')
+vk = Vk(access_token='token')
 lp = LongPoll(vk, MemoryStorage())
 
 GENDERS = ('Male', 'Female', 'Other')
