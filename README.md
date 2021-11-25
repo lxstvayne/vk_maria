@@ -14,7 +14,7 @@
 
 [Pip](https://pypi.org/project/vk-maria/)
 
-[Документация]()
+[Документация](https://github.com/lxstvayne/vk_maria/wiki)
 
 [Исходники](https://github.com/lxstvayne/vk_maria)
 
