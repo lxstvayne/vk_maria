@@ -103,6 +103,17 @@ class LongPoll:
                                     state=state,
                                     **kwargs)
 
+    def register_callback_handler(self,
+                                  function: callable,
+                                  *filters,
+                                  state=None,
+                                  **bound_filters):
+        self.register_event_handler(function,
+                                    event_type=EventType.MESSAGE_EVENT,
+                                    *filters,
+                                    state=state,
+                                    **bound_filters)
+
     def event_handler(self,
                       event_type: EventType,
                       *filters,
@@ -123,6 +134,13 @@ class LongPoll:
                                   commands=commands,
                                   frm=frm,
                                   regexp=regexp,
+                                  state=state)
+
+    def callback_handler(self,
+                         *filters,
+                         state=None):
+        return self.event_handler(EventType.MESSAGE_EVENT,
+                                  *filters,
                                   state=state)
 
     @staticmethod
