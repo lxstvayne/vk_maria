@@ -128,8 +128,8 @@ class MessageEvent(Event, Message):
         elif self.from_group:
             kwargs.update(peer_id=self.message.from_id)
 
-        self.vk.messages_send(message=message, **kwargs)
+        return self.vk.messages_send(message=message, **kwargs)
 
     def reply(self, message: str = None, **kwargs):
         kwargs.update(reply_to=self.message.id)
-        self.answer(message=message, **kwargs)
+        return self.answer(message=message, **kwargs)
