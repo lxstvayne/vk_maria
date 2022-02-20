@@ -75,6 +75,11 @@ def args_converter(method):
                 kwargs[keyword] = ','.join(str(el) for el in value)
             elif keyword == 'forward_messages':
                 kwargs[keyword] = ','.join(str(el) for el in value)
+            elif keyword == 'attachment':
+                if isinstance(value, str):
+                    kwargs[keyword] = value
+                elif isinstance(value, list):
+                    kwargs[keyword] = ','.join(value)
             elif keyword == 'keyboard':
                 if not isinstance(value, str):
                     if isinstance(value, KeyboardMarkup):
