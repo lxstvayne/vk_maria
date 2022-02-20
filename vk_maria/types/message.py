@@ -23,6 +23,7 @@ class MessageInfo(DotDict):
 
 
 class Message(BaseEvent):
+    """Описывает события типа MESSAGE_NEW"""
     message: MessageInfo
     from_user: bool
     from_chat: bool
@@ -44,4 +45,16 @@ class Message(BaseEvent):
         """
         Не работает в беседах из-за ограниченного апи
         """
+        pass
+
+
+class CallbackQuery(BaseEvent):
+    """Описывает события типа MESSAGE_EVENT"""
+    user_id: int
+    peer_id: int
+    event_id: str
+    payload: DotDict
+    conversation_message_id: int
+
+    def answer(self, event_data: dict = None):
         pass

@@ -7,7 +7,7 @@ from requests.exceptions import ReadTimeout
 from .filters.handler import HandlerManager
 from .fsm import DisabledStorage, BaseStorage, FSMContext
 from .fsm.types import Chat
-from .types import Event, MessageEvent, EventType
+from .types import Event, MessageEvent, CallbackQueryEvent, EventType
 from ..api import Vk
 
 logger.remove()
@@ -23,6 +23,7 @@ class LongPoll:
         EventType.MESSAGE_NEW.value: MessageEvent,
         EventType.MESSAGE_REPLY.value: MessageEvent,
         EventType.MESSAGE_EDIT.value: MessageEvent,
+        EventType.MESSAGE_EVENT.value: CallbackQueryEvent
     }
 
     __DEFAULT_EVENT_CLASS = Event

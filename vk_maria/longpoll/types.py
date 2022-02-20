@@ -2,7 +2,7 @@ from enum import Enum
 
 from pydotdict import DotDict
 
-from ..types import Message
+from ..types import Message, CallbackQuery
 
 CHAT_START_ID = int(2E9)
 
@@ -133,3 +133,11 @@ class MessageEvent(Event, Message):
     def reply(self, message: str = None, **kwargs):
         kwargs.update(reply_to=self.message.id)
         return self.answer(message=message, **kwargs)
+
+
+class CallbackQueryEvent(Event, CallbackQuery):
+    def __init__(self, vk, raw):
+        super().__init__(vk, raw)
+
+    def answer(self, event_data: dict = None):
+        return self.vk.messages_send_message_event_answer(self.event_id, self.user_id, self.peer_id, event_data)
