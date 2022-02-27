@@ -110,7 +110,7 @@ class LongPoll:
                                   state=None,
                                   **bound_filters):
         self.register_event_handler(function,
-                                    event_type=EventType.MESSAGE_EVENT,
+                                    EventType.MESSAGE_EVENT,
                                     *filters,
                                     state=state,
                                     **bound_filters)
