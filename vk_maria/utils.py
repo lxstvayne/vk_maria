@@ -86,6 +86,8 @@ def args_converter(method):
                         kwargs[keyword] = value.get_json()
                     elif issubclass(value, KeyboardModel):
                         kwargs[keyword] = value.__json__
+            elif keyword == 'cmids':
+                kwargs[keyword] = ','.join(value)
             elif keyword == 'fields':
                 kwargs[keyword] = ','.join(value)
             elif keyword == 'message_ids':

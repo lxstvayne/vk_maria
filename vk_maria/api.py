@@ -56,14 +56,18 @@ class Vk:
 
         return self.method('messages.createChat', group_id=self.group_id, user_ids=user_ids, title=title)
 
-    def messages_delete(self, message_ids: List[int], spam: int = None, delete_for_all: int = None):
+    def messages_delete(self, message_ids: List[int] = None,
+                        spam: int = None,
+                        delete_for_all: int = None,
+                        cmids: List[int] = None):
         """
         :param message_ids: Список идентификаторов сообщений.
         :param spam: Помечает сообщения как спам.
         :param delete_for_all: Удаление для всех.
+        :param cmids: Conversation Message Ids
         """
         return self.method('messages.delete', group_id=self.group_id, message_ids=message_ids,
-                           spam=spam, delete_for_all=delete_for_all)
+                           spam=spam, delete_for_all=delete_for_all, cmids=cmids)
 
     def messages_delete_chat_photo(self, chat_id: int):
         """
