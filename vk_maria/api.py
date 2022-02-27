@@ -57,6 +57,7 @@ class Vk:
         return self.method('messages.createChat', group_id=self.group_id, user_ids=user_ids, title=title)
 
     def messages_delete(self, message_ids: List[int] = None,
+                        peer_id: int = None,
                         spam: int = None,
                         delete_for_all: int = None,
                         cmids: List[int] = None):
@@ -67,7 +68,7 @@ class Vk:
         :param cmids: Conversation Message Ids
         """
         return self.method('messages.delete', group_id=self.group_id, message_ids=message_ids,
-                           spam=spam, delete_for_all=delete_for_all, cmids=cmids)
+                           spam=spam, delete_for_all=delete_for_all, cmids=cmids, peer_id=peer_id)
 
     def messages_delete_chat_photo(self, chat_id: int):
         """
