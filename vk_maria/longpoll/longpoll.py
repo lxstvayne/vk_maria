@@ -121,6 +121,7 @@ class LongPoll:
                       **bound_filters):
         def wrapper(callback):
             self.register_event_handler(callback, event_type, *filters, **bound_filters)
+            return callback
 
         return wrapper
 
