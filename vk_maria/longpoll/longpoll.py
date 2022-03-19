@@ -84,7 +84,7 @@ class LongPoll:
                                event_type: EventType,
                                *filters,
                                **bound_filters):
-        bound_filters = {k: v for k, v in bound_filters.items() if v}
+        bound_filters = {k: v for k, v in bound_filters.items() if v is not None}
         self._handler_manager.register_handler(function, event_type=event_type, *filters, **bound_filters)
 
     def register_message_handler(self,
@@ -130,20 +130,24 @@ class LongPoll:
                         commands: typing.List[str] = None,
                         frm: str = 'user',
                         regexp: str = None,
-                        state=None):
+                        state=None,
+                        **bound_filters):
         return self.event_handler(EventType.MESSAGE_NEW,
                                   *filters,
                                   commands=commands,
                                   frm=frm,
                                   regexp=regexp,
-                                  state=state)
+                                  state=state,
+                                  **bound_filters)
 
     def callback_handler(self,
                          *filters,
-                         state=None):
+                         state=None,
+                         **bound_filters):
         return self.event_handler(EventType.MESSAGE_EVENT,
                                   *filters,
-                                  state=state)
+                                  state=state,
+                                  **bound_filters)
 
     @staticmethod
     def _update_chat_context(event):
