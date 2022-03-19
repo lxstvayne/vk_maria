@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = '2.1.8'
+__version__ = '2.1.9'
 
 setup(name='vk_maria',
       version=__version__,
