@@ -86,6 +86,16 @@ class TextFilter(BoundFilter):
             return text.endswith(self._pre_process_text(self.endswith))
 
 
+class FunctionFilter(BoundFilter):
+    key = 'f'
+
+    def __init__(self, f):
+        self.f = f
+
+    def check(self, event: MessageEvent):
+        return self.f(event)
+
+
 class CommandsFilter(BoundFilter):
     key = 'commands'
 
