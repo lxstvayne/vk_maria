@@ -170,6 +170,9 @@ class LongPoll:
                     if handler.test_handler(event):
                         handler(event)
                         break
+        except Exception as e:
+            if debug:
+                logger.exception(e)
         finally:
             if on_shutdown:
                 on_shutdown()
