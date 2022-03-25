@@ -155,15 +155,25 @@ class LongPoll:
         if event.type == EventType.MESSAGE_NEW:
             Chat.set(chat_id, user_id)
 
-    def polling(self, debug=False):
-        for event in self.listen():
+    def polling(self, debug=False, on_startup=None, on_shutdown=None):
+        if on_startup:
+            on_startup()
+        try:
+            for event in self.listen():
 
-            if debug:
-                logger.info(event)
+                if debug:
+                    logger.info(event)
 
-            self._update_chat_context(event)
+                self._update_chat_context(event)
 
-            for handler in self._handler_manager.handlers:
-                if handler.test_handler(event):
-                    handler(event)
-                    break
+                for handler in self._handler_manager.handlers:
+                    if handler.test_handler(event):
+                        handler(event)
+                        break
+        finally:
+            if on_shutdown:
+                on_shutdown()
+                return
+
+            self._storage.close()
+
