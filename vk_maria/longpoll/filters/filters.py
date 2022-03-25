@@ -54,25 +54,36 @@ class TextFilter(BoundFilter):
         """
         Можно использовать что-то одно из equals, contains, startswith и endswith
         """
+        check_count = sum(map(lambda x: x is not None, (equals, contains, startswith, endswith)))
+        if check_count > 1:
+            args = '` и `'.join([el[0]
+                                 for el in (('equals', equals), ('contains', contains),
+                                            ('startswith', startswith), ('endswith', endswith))
+                                 if el[1] is not None])
+            raise ValueError(f"Аргументы `{args}` не могут использоваться вместе!")
+        elif check_count == 0:
+            raise ValueError("Ни один из требуемых аргументов не передан!")
+
         self.equals = equals
         self.contains = contains
         self.startswith = startswith
         self.endswith = endswith
         self.ignore_case = ignore_case
 
+    def _pre_process_text(self, s):
+        return str(s).lower() if self.ignore_case else str(s)
+
     def check(self, event: MessageEvent):
-        text = event.message.text
-        if self.ignore_case:
-            text = text.lower()
+        text = self._pre_process_text(event.message.text)
 
         if self.equals:
-            return text == self.equals
+            return text == self._pre_process_text(self.equals)
         elif self.contains:
-            return self.contains in text
+            return self._pre_process_text(self.contains) in text
         elif self.startswith:
-            return text.startswith(self.startswith)
+            return text.startswith(self._pre_process_text(self.startswith))
         elif self.endswith:
-            return text.endswith(self.endswith)
+            return text.endswith(self._pre_process_text(self.endswith))
 
 
 class CommandsFilter(BoundFilter):
