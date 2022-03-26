@@ -1,6 +1,10 @@
 import typing
 
-from ..types import Event, EventType
+from .event import Event
+from .event_type import EventType
+
+
+CHAT_START_ID = int(2E9)
 
 
 class Chat:

@@ -1,4 +1,4 @@
-from .state import State, StatesGroup, any_state
+from .state import State, StatesGroup
 from .storage import (
     BaseStorage,
     FSMContext,

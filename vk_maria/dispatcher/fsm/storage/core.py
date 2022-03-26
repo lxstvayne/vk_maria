@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 
 from loguru import logger
 
-from vk_maria.longpoll.fsm.types import Chat
-from vk_maria.longpoll.mixins import ContextInstanceMixin
+from ....types import Chat
+from ....mixins import Singleton
 
 
 class BaseStorage(ABC):
@@ -82,11 +82,12 @@ class BaseStorage(ABC):
 
     def finish(self, *,
                chat: typing.Union[str, int, None] = None,
-               user: typing.Union[str, int, None] = None):
-        self.reset_state(chat=chat, user=user, with_data=True)
+               user: typing.Union[str, int, None] = None,
+               with_data: bool = False):
+        self.reset_state(chat=chat, user=user, with_data=with_data)
 
 
-class FSMContext(ContextInstanceMixin):
+class FSMContext(Singleton):
     def __init__(self, storage: BaseStorage):
         self.storage: BaseStorage = storage
 
@@ -111,8 +112,8 @@ class FSMContext(ContextInstanceMixin):
     def reset_data(self):
         self.storage.reset_data(chat=Chat.get_chat_id(), user=Chat.get_user_id(), )
 
-    def finish(self):
-        self.storage.finish(chat=Chat.get_chat_id(), user=Chat.get_user_id(), )
+    def finish(self, with_data: bool = False):
+        self.storage.finish(chat=Chat.get_chat_id(), user=Chat.get_user_id(), with_data=with_data)
 
 
 class DisabledStorage(BaseStorage):

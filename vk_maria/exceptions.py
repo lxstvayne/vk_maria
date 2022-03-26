@@ -38,7 +38,7 @@ class KeyIsNotValidError(Exception):
     pass
 
 
-class VkMariaException:
+class VkMariaException(Exception):
     exceptions = {
         1: UnknownError,
         3: UnknownMethodError,

@@ -1,11 +1,11 @@
 from vk_maria import Vk, types
-from vk_maria.longpoll import LongPoll
-from vk_maria.longpoll.fsm import StatesGroup, State, MemoryStorage, FSMContext
+from vk_maria.dispatcher import Dispatcher
+from vk_maria.dispatcher.fsm import StatesGroup, State, MemoryStorage, FSMContext
 from vk_maria.keyboard import KeyboardMarkup, Button, Color, EmptyKeyboard
 
 
 vk = Vk(access_token='token')
-lp = LongPoll(vk, MemoryStorage())
+lp = Dispatcher(vk, MemoryStorage())
 
 GENDERS = ('Male', 'Female', 'Other')
 
@@ -35,7 +35,7 @@ def process_age(event: types.Message, state: FSMContext):
 
     markup = KeyboardMarkup(one_time=False)
     for gender in GENDERS:
-        markup.add_button(Button.Text(Color.PRIMARY, gender))
+        markup.add_button(Button.TextButton(Color.PRIMARY, gender))
 
     event.reply('What is your gender?', keyboard=markup)
     Form.next()
@@ -55,5 +55,5 @@ def process_gender(event: types.Message, state: FSMContext):
 
 
 if __name__ == '__main__':
-    lp.polling(debug=True)
+    lp.start_polling(debug=True)
 

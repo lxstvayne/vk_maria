@@ -4,7 +4,7 @@ from functools import partial
 
 from .filters import Filters, FiltersFactory, AbstractFilter
 from ..fsm import FSMContext
-from ..types import Event
+from ...types import Event
 
 
 class HandlerObject:

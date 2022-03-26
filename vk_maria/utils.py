@@ -6,8 +6,7 @@ import time
 from pydotdict import DotDict
 
 from .exceptions import VkMariaException
-from .keyboard import KeyboardModel
-from .keyboard.keyboard import KeyboardMarkup
+from .types import KeyboardMarkup, KeyboardModel
 
 
 def error_catcher(method):

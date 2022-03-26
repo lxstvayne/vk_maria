@@ -3,7 +3,7 @@ import typing
 from abc import ABC, abstractmethod
 
 from ..fsm import FSMContext
-from ..types import Event, MessageEvent, EventType
+from ...types import Event, MessageEvent, EventType
 
 
 class AbstractFilter(ABC):

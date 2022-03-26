@@ -1,6 +1,6 @@
 from .storage import FSMContext
 
-__all__ = ('State', 'any_state', 'StatesGroup')
+__all__ = ('State', 'StatesGroup')
 
 
 class State:
@@ -17,9 +17,6 @@ class State:
 
     def __eq__(self, other):
         return self.state == other
-
-
-any_state = State('*')
 
 
 class StatesGroupMeta(type):

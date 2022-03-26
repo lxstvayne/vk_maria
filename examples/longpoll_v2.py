@@ -1,12 +1,12 @@
 from vk_maria import Vk, types
-from vk_maria.longpoll import LongPoll, EventType
+from vk_maria.dispatcher import Dispatcher, EventType
 
 
 def main():
     """Альтернативный пример работы лонгпулла, через удобные декораторы"""
 
     vk = Vk(access_token='token')
-    longpoll = LongPoll(vk)
+    longpoll = Dispatcher(vk)
 
     @longpoll.event_handler(event_type=EventType.MESSAGE_NEW)
     def new_msg(event: types.Message):
@@ -21,7 +21,7 @@ def main():
     def typing_msg(event):
         print(f'{event.from_id} Печатает')
 
-    longpoll.polling()
+    longpoll.start_polling()
 
 
 if __name__ == '__main__':

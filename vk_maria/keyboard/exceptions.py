@@ -1,2 +1,0 @@
-class KeyboardNotFoundError(Exception):
-    pass

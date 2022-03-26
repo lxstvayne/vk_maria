@@ -1,7 +1,7 @@
 import copy
 import typing
 
-from vk_maria.longpoll.fsm.storage.core import BaseStorage
+from vk_maria.dispatcher.fsm.storage.core import BaseStorage
 
 
 class MemoryStorage(BaseStorage):
