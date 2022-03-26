@@ -1,5 +1,6 @@
 from vk_maria import Vk
-from vk_maria.dispatcher import Dispatcher, EventType
+from vk_maria.longpoll import LongPoll
+from vk_maria.types import EventType
 
 
 def main():
@@ -7,7 +8,7 @@ def main():
 
     vk = Vk(access_token='token')
 
-    for event in Dispatcher(vk).listen():
+    for event in LongPoll(vk).listen():
 
         if event.type is EventType.MESSAGE_NEW:
             print(f'Новое сообщение для меня от {event.message.peer_id}')

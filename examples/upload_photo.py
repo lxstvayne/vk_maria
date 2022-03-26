@@ -8,7 +8,7 @@ def main():
     vk = Vk(access_token='token')
     upload = Upload(vk)
 
-    photo = upload.photo('your_photo.png') # Или upload.photo(open('your_photo.png', 'rb'))
+    photo = upload.photo('your_photo.png')  # Или upload.photo(open('your_photo.png', 'rb'))
 
     vk.messages_send(user_id=1234567890, attachment=photo)
 
