@@ -39,8 +39,8 @@
     from vk_maria.dispatcher.filters import AbstractFilter
 
     class AdminFilter(AbstractFilter):
-    def check(self, event: types.Message):
-        return event.message.peer_id == 1234567890
+        def check(self, event: types.Message):
+            return event.message.peer_id == 1234567890
 
 И передать его в обработчик события:
 
