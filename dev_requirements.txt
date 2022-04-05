@@ -1,0 +1,4 @@
+requests>=2.20.1
+loguru>=0.5.3
+pydotdict>=3.3.11
+furo
