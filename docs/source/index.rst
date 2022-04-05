@@ -47,6 +47,7 @@ Contents
 -----------
 
 .. toctree::
+   :maxdepth: 2
 
    installation.rst
    quickstart.rst
@@ -55,8 +56,6 @@ Contents
    upload.rst
    keyboards.rst
    fsm.rst
-
-.. include::
    modules.rst
 
 Indices and tables
