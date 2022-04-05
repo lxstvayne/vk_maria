@@ -33,12 +33,12 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
     'sphinx_autodoc_typehints',
-    'autoapi.extension'
+    # 'autoapi.extension'
 ]
 
-autoapi_dirs = ['../../vk_maria']
-
-autoapi_options = ['members', 'inherited-members', 'undoc-members', 'show-inheritance']
+# autoapi_dirs = ['../../vk_maria']
+#
+# autoapi_options = ['members', 'inherited-members', 'undoc-members', 'show-inheritance']
 
 autodoc_default_options = {
     'members': True,

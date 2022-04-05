@@ -3,4 +3,3 @@ loguru>=0.5.3
 pydotdict>=3.3.11
 furo
 sphinx_autodoc_typehints
-sphinx-autoapi
