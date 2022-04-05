@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-__version__ = '2.1.9'
+__version__ = '3.0.0'
 
 setup(name='vk_maria',
       version=__version__,
@@ -9,7 +9,7 @@ setup(name='vk_maria',
       long_description_content_type="text/markdown",
       url='https://github.com/lxstvayne/vk_maria',
       keywords='vk bot tools',
-      packages=find_packages(exclude=('tests',)),
+      packages=find_packages(exclude=('tests', 'docs')),
       install_requires=[
           'requests>=2.20.1',
           'loguru>=0.5.3',
