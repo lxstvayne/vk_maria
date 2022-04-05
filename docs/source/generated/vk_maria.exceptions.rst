@@ -1,0 +1,40 @@
+vk\_maria.exceptions
+====================
+
+.. automodule:: vk_maria.exceptions
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Exceptions
+
+   .. autosummary::
+      :toctree:
+   
+      AccessIsDeniedError
+      AuthorizationError
+      DeprecatedMethodError
+      InvalidParametersError
+      KeyIsNotValidError
+      PermissionError
+      ServerError
+      UnknownError
+      UnknownMethodError
+      VkMariaException
+      WrongRequestError
+   
+   
+
+
+

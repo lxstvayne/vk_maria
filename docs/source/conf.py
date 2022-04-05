@@ -32,8 +32,13 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
-    'sphinx_autodoc_typehints'
+    'sphinx_autodoc_typehints',
+    'autoapi.extension'
 ]
+
+autoapi_dirs = ['../../vk_maria']
+
+autoapi_options = ['members', 'inherited-members', 'undoc-members', 'show-inheritance']
 
 autodoc_default_options = {
     'members': True,
@@ -41,6 +46,9 @@ autodoc_default_options = {
     'inherited-members': True,
     'undoc-members': True
 }
+
+
+autodoc_typehints = 'description'
 
 autosummary_generate = True
 autoclass_content = "both"  # Add __init__ doc (ie. params) to class summaries
@@ -50,7 +58,6 @@ set_type_checking_flag = True  # Enable 'expensive' imports for sphinx_autodoc_t
 add_module_names = False  # Remove namespaces from class/method signatures
 always_document_param_types = True
 typehints_defaults = 'comma'
-autodoc_typehints = "both"
 autodoc_typehints_description_target = 'all'
 
 # Add any paths that contain templates here, relative to this directory.

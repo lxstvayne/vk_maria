@@ -56,7 +56,7 @@ Contents
    upload.rst
    keyboards.rst
    fsm.rst
-   modules.rst
+
 
 Indices and tables
 ==================
