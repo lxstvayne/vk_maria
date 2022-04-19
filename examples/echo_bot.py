@@ -3,7 +3,7 @@ from vk_maria.dispatcher import Dispatcher
 
 
 def main():
-    """Пример простейшего бота через декоратор лонгпулла"""
+    """Пример простейшего бота через диспетчер"""
 
     vk = Vk(access_token='token')
     dp = Dispatcher(vk)
