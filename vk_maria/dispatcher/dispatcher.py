@@ -88,15 +88,20 @@ class Dispatcher:
     def callback_handler(self,
                          *filters,
                          state=None,
+                         payload=None,
                          **bound_filters):
         return self.event_handler(EventType.MESSAGE_EVENT,
                                   *filters,
                                   state=state,
+                                  payload=payload,
                                   **bound_filters)
 
     @staticmethod
     def _update_chat_context(event):
-        if event.type == EventType.MESSAGE_NEW:
+        if event.type in (
+            EventType.MESSAGE_NEW,
+            EventType.MESSAGE_EVENT,
+        ):
             chat_id, user_id = Chat.resolve_address(event)
             Chat.set(chat_id, user_id)
 

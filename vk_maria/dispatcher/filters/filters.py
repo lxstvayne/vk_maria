@@ -3,7 +3,7 @@ import typing
 from abc import ABC, abstractmethod
 
 from ..fsm import FSMContext
-from ...types import Event, MessageEvent, EventType
+from ...types import Event, MessageEvent, EventType, CallbackQueryEvent
 
 
 class AbstractFilter(ABC):
@@ -160,6 +160,16 @@ class FSMStateFilter(BoundFilter):
         if self.state == FSMContext.get_current().get_state() or self.state == '*':
             return True
         return False
+
+
+class PayloadFilter(BoundFilter):
+    key = 'payload'
+
+    def __init__(self, payload):
+        self.payload = payload
+
+    def check(self, event: CallbackQueryEvent):
+        return self.payload == event.payload
 
 
 class Filters:
