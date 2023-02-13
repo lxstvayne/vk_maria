@@ -1,12 +1,11 @@
 from setuptools import setup, find_packages
 
-__version__ = '3.0.2'
+__version__ = '3.0.7'
 
 setup(name='vk_maria',
       version=__version__,
       description='vk bot api framework',
       long_description=open('README.rst', encoding='utf-8').read(),
-      long_description_content_type="text/markdown",
       url='https://github.com/lxstvayne/vk_maria',
       keywords='vk bot tools',
       packages=find_packages(exclude=('tests', 'docs')),
