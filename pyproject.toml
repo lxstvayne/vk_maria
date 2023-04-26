@@ -2,14 +2,14 @@
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "vk-maria"
 version = "3.0.8"
 description = "Simple Vk Bot synchronous framework"
 authors = ["lxstvayne"]
 license = "GPL-3.0"
 readme = "README.rst"
-requires-python = ">=3.8"
+
 keywords = [
     "vk",
     "bot",
@@ -27,18 +27,18 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Communications :: Chat",
 ]
-dependencies = [
-    "requests>=2.20.1",
-    "loguru>=0.5.3",
-    "pydotdict>=3.3.11"
-]
 
-[project.optional-dependencies]
-docs = [
-    "furo",
-    "sphinx_autodoc_typehints"
-]
+[tool.poetry.dependencies]
+python = ">=3.8"
+requests = ">=2.20.1"
+loguru = ">=0.5.3"
+pydotdict = ">=3.3.11"
 
-[project.urls]
+[tool.poetry.group.docs.dependencies]
+furo = "*"
+sphinx_autodoc_typehints = "*"
+
+
+[tool.poetry.urls]
 Documentation = "https://vk-maria.readthedocs.io/ru/latest/"
 Repository = "https://github.com/lxstvayne/vk_maria"
