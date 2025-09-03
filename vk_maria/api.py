@@ -5,7 +5,7 @@ from .utils import error_catcher, query_delimiter, get_random_id, response_parse
 
 
 class ApiMethod:
-    base_url: str = 'https://api.vk.com/method/'
+    base_url: str = 'https://api.vk.ru/method/'
     http = requests.Session()
     rps_delay = 0.05
     last_request = 0.0
