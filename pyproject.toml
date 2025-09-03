@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "vk-maria"
-version = "3.0.8"
+version = "3.0.9"
 description = "Simple Vk Bot synchronous framework"
 authors = ["lxstvayne"]
 license = "GPL-3.0"
